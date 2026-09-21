@@ -1,84 +1,1214 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"> <title>Mayan Sculpture AR</title> <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script> <style> *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; } html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#111; color:#fff; font-family:Arial,sans-serif; } body{ touch-action:manipulation; } .app{ position:relative; width:100%; height:100dvh; overflow:hidden; } header{ position:absolute; top:env(safe-area-inset-top,0); left:0; width:100%; z-index:20; padding:14px 16px 10px; text-align:center; pointer-events:none; background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent); } header h1{ margin:0; font-size:21px; } header p{ margin:5px 0 0; color:#ccc; font-size:12px; } .viewer{ position:absolute; inset:0; } model-viewer{ width:100%; height:100%; background:#181818; --poster-color:#181818; touch-action:none; } .ar-button{ position:absolute; left:50%; bottom:125px; transform:translateX(-50%); border:0; border-radius:18px; padding:14px 25px; background:#d9a441; color:#111; font-size:15px; font-weight:800; box-shadow:0 5px 20px rgba(0,0,0,.4); } .bottom-controls{ position:absolute; left:50%; bottom:calc(12px + env(safe-area-inset-bottom,0)); transform:translateX(-50%); z-index:30; display:flex; align-items:center; justify-content:center; gap:7px; padding:9px; border-radius:22px; background:rgba(0,0,0,.8); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); } .btn{ width:48px; height:48px; border:0; border-radius:14px; display:flex; align-items:center; justify-content:center; background:#303030; color:white; font-size:20px; font-weight:bold; user-select:none; -webkit-user-select:none; touch-action:manipulation; } .btn:active{ transform:scale(.9); } .btn.photo{ background:white; color:#111; } .btn.video{ background:#d9a441; color:#111; } .btn.recording{ background:#e53935; color:white; animation:pulse 1s infinite; } @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(229,57,53,.7); } 70%{ box-shadow:0 0 0 10px rgba(229,57,53,0); } 100%{ box-shadow:0 0 0 0 rgba(229,57,53,0); } } .recording-indicator{ position:absolute; top:70px; left:50%; transform:translateX(-50%); z-index:40; display:none; padding:7px 14px; border-radius:20px; background:#e53935; color:white; font-size:12px; font-weight:bold; } .recording-indicator.active{ display:block; } .help{ position:absolute; left:50%; bottom:78px; transform:translateX(-50%); z-index:15; color:rgba(255,255,255,.75); font-size:11px; white-space:nowrap; pointer-events:none; } .status{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:50; display:none; max-width:85%; padding:14px 18px; border-radius:15px; background:rgba(0,0,0,.88); color:white; font-size:13px; line-height:1.4; text-align:center; } .status.show{ display:block; } @media(max-width:380px){ .btn{ width:43px; height:43px; border-radius:13px; } .bottom-controls{ gap:5px; padding:7px; } .ar-button{ bottom:112px; padding:13px 19px; } } </style> </head> <body> <div class="app"> <header> <h1>Mayan Sculpture</h1> <p>Explore the sculpture in augmented reality</p> </header> <div class="viewer">
+<!DOCTYPE html>
+<html lang="en">
 
-<model-viewer
-id="model"
+<head>
+    <meta charset="UTF-8">
 
-src="./escultura.glb"
+    <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1.0,
+        maximum-scale=1.0,
+        user-scalable=no,
+        viewport-fit=cover">
 
-alt="Mayan sculpture"
+    <title>Mayan Sculpture AR</title>
 
-ar
+    <script type="module"
+        src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+    </script>
 
-ar-modes="webxr scene-viewer quick-look"
+    <style>
 
-camera-controls
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-touch-action="none"
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
 
-shadow-intensity="1"
+            overflow: hidden;
 
-shadow-softness="0.7"
+            background: #111;
+            color: white;
 
-exposure="1"
+            font-family: Arial, sans-serif;
+        }
 
-environment-image="neutral"
+        body {
+            touch-action: manipulation;
+        }
 
-interaction-prompt="auto"
+        /* ================================
+           APP
+        ================================= */
 
-camera-orbit="0deg 75deg 3m"
+        .app {
+            position: relative;
 
-min-camera-orbit="auto 10deg 0.5m"
+            width: 100%;
+            height: 100dvh;
 
-max-camera-orbit="auto 170deg 10m"
+            overflow: hidden;
 
-field-of-view="30deg">
+            background: #111;
+        }
 
-<button
-    slot="ar-button"
-    class="ar-button"
-    id="enterAR">
 
-    📱 ENTER AR
+        /* ================================
+           HEADER
+        ================================= */
 
-</button>
+        header {
+            position: absolute;
 
-</model-viewer> </div> <div id="recordingIndicator" class="recording-indicator">
-🔴 RECORDING
+            top: env(safe-area-inset-top, 0px);
+            left: 0;
 
-</div> <div id="status" class="status"> </div> <div class="help"> Drag to rotate · Pinch to zoom </div> <div class="bottom-controls">
+            width: 100%;
 
-<button class="btn" id="reset" aria-label="Reset view">
+            z-index: 20;
 
-🎯
+            padding: 15px 16px 12px;
 
-</button>
+            text-align: center;
 
-<button class="btn" id="auto" aria-label="Auto rotate">
+            pointer-events: none;
 
-▶
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,.75),
+                    transparent
+                );
+        }
 
-</button>
+        header h1 {
+            margin: 0;
 
-<button class="btn" id="zoomOut" aria-label="Zoom out">
+            font-size: 22px;
+            font-weight: 700;
+        }
 
-−
+        header p {
+            margin: 5px 0 0;
 
-</button>
+            color: #ccc;
 
-<button class="btn" id="zoomIn" aria-label="Zoom in">
+            font-size: 12px;
+        }
 
-+
 
-</button>
+        /* ================================
+           MODEL VIEWER
+        ================================= */
 
-<button class="btn photo" id="photo" aria-label="Take photo">
+        .viewer {
+            position: absolute;
 
-📸
+            inset: 0;
+        }
 
-</button>
+        model-viewer {
 
-<button class="btn video" id="video" aria-label="Record video">
+            width: 100%;
+            height: 100%;
 
-🎥
+            background: #181818;
 
-</button> </div> </div> <script> const model = document.getElementById("model"); const resetButton = document.getElementById("reset"); const autoButton = document.getElementById("auto"); const zoomInButton = document.getElementById("zoomIn"); const zoomOutButton = document.getElementById("zoomOut"); const photoButton = document.getElementById("photo"); const videoButton = document.getElementById("video"); const indicator = document.getElementById("recordingIndicator"); const status = document.getElementById("status"); const DEFAULT_ORBIT = "0deg 75deg 3m"; let autoRotation = false; let recorder = null; let videoChunks = []; let recordingStream = null; function showStatus(message,time=2500){ status.textContent = message; status.classList.add("show"); setTimeout( () => status.classList.remove("show"), time ); } function resetView(){ model.cameraOrbit = DEFAULT_ORBIT; model.fieldOfView = "30deg"; } resetButton.addEventListener( "click", resetView ); function changeZoom(multiplier){ const orbit = model.getCameraOrbit(); let radius = orbit.radius * multiplier; radius = Math.max( .5, Math.min(10,radius) ); model.cameraOrbit = `${orbit.theta}rad ` + `${orbit.phi}rad ` + `${radius}m`; } zoomInButton.addEventListener( "click", () => changeZoom(.82) ); zoomOutButton.addEventListener( "click", () => changeZoom(1.22) ); function toggleAutoRotation(){ autoRotation = !autoRotation; if(autoRotation){ model.setAttribute( "auto-rotate", "" ); model.setAttribute( "rotation-per-second", "20deg" ); autoButton.textContent = "⏸"; }else{ model.removeAttribute( "auto-rotate" ); autoButton.textContent = "▶"; } } autoButton.addEventListener( "click", toggleAutoRotation ); async function takePhoto(){ try{ if( typeof model.toBlob !== "function" ){ throw new Error( "Photo capture unavailable" ); } const blob = await model.toBlob({ idealAspect:1, mimeType: "image/png" }); if(!blob){ throw new Error( "Image creation failed" ); } const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = `mayan-sculpture-${Date.now()}.png`; document.body.appendChild(link); link.click(); link.remove(); setTimeout( () => URL.revokeObjectURL(url), 1500 ); showStatus( "Photo saved." ); }catch(error){ console.error(error); showStatus( "Photo capture is not available in this browser.", 4000 ); } } photoButton.addEventListener( "click", takePhoto ); function getCanvas(){ if(!model.shadowRoot){ return null; } return model.shadowRoot .querySelector("canvas"); } function getMimeType(){ const formats = [ "video/mp4", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm" ]; for( const format of formats ){ if( MediaRecorder .isTypeSupported(format) ){ return format; } } return ""; } function startRecording(){ try{ const canvas = getCanvas(); if(!canvas){ throw new Error( "Canvas unavailable" ); } if( !canvas.captureStream ){ throw new Error( "Recording unsupported" ); } recordingStream = canvas.captureStream(30); const mimeType = getMimeType(); const options = mimeType ? {mimeType} : {}; videoChunks = []; recorder = new MediaRecorder( recordingStream, options ); recorder.ondataavailable = event => { if( event.data && event.data.size > 0 ){ videoChunks.push( event.data ); } }; recorder.onstop = saveVideo; recorder.start(1000); videoButton.classList.add( "recording" ); videoButton.textContent = "⏹"; indicator.classList.add( "active" ); showStatus( "Recording started." ); }catch(error){ console.error(error); showStatus( "Video recording is not supported by this browser.", 4000 ); } } function stopRecording(){ if( recorder && recorder.state === "recording" ){ recorder.stop(); } } function saveVideo(){ if(!videoChunks.length){ resetRecordingUI(); showStatus( "No video was produced.", 3000 ); return; } const type = recorder.mimeType || "video/webm"; const blob = new Blob( videoChunks, {type} ); const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; const extension = type.includes("mp4") ? "mp4" : "webm"; link.download = `mayan-sculpture-${Date.now()}.${extension}`; document.body.appendChild(link); link.click(); link.remove(); setTimeout( () => URL.revokeObjectURL(url), 3000 ); if(recordingStream){ recordingStream .getTracks() .forEach( track => track.stop() ); } resetRecordingUI(); showStatus( "Video saved." ); } function resetRecordingUI(){ videoButton.classList.remove( "recording" ); videoButton.textContent = "🎥"; indicator.classList.remove( "active" ); recorder = null; videoChunks = []; recordingStream = null; } videoButton.addEventListener( "click", () => { if( recorder && recorder.state === "recording" ){ stopRecording(); }else{ startRecording(); } } ); model.addEventListener( "load", () => { resetView(); } ); model.addEventListener( "ar-status", event => { console.log( "AR status:", event.detail ); } ); if( navigator.xr && navigator.xr.isSessionSupported ){ navigator.xr .isSessionSupported( "immersive-ar" ) .then( supported => { console.log( "WebXR AR:", supported ); } ) .catch( error => console.log(error) ); } </script> </body> </html>
+            --poster-color: #181818;
+
+            touch-action: none;
+
+        }
+
+
+        /* ================================
+           AR BUTTON
+        ================================= */
+
+        .ar-button {
+
+            position: absolute;
+
+            left: 50%;
+
+            bottom:
+                calc(
+                    125px +
+                    env(safe-area-inset-bottom, 0px)
+                );
+
+            transform: translateX(-50%);
+
+            border: none;
+
+            border-radius: 18px;
+
+            padding: 14px 24px;
+
+            background: #d9a441;
+
+            color: #111;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            white-space: nowrap;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.45);
+
+            cursor: pointer;
+
+            touch-action: manipulation;
+        }
+
+        .ar-button:active {
+
+            transform:
+                translateX(-50%)
+                scale(.95);
+
+        }
+
+
+        /* ================================
+           BOTTOM CONTROLS
+        ================================= */
+
+        .bottom-controls {
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom:
+                calc(
+                    16px +
+                    env(safe-area-inset-bottom, 0px)
+                );
+
+            z-index: 30;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 15px;
+
+            pointer-events: none;
+        }
+
+
+        /* ================================
+           CUBE BUTTON
+        ================================= */
+
+        .cube-button {
+
+            width: 62px;
+            height: 62px;
+
+            border: none;
+
+            border-radius: 17px;
+
+            background:
+                rgba(0,0,0,.80);
+
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.4);
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            cursor: grab;
+
+            touch-action: none;
+
+            pointer-events: auto;
+        }
+
+        .cube-button:active {
+            cursor: grabbing;
+        }
+
+
+        /* ================================
+           3D CUBE
+        ================================= */
+
+        .cube-scene {
+
+            width: 36px;
+            height: 36px;
+
+            perspective: 180px;
+
+        }
+
+        .cube {
+
+            position: relative;
+
+            width: 34px;
+            height: 34px;
+
+            transform-style: preserve-3d;
+
+            transform:
+                rotateX(-25deg)
+                rotateY(35deg);
+
+        }
+
+        .face {
+
+            position: absolute;
+
+            width: 34px;
+            height: 34px;
+
+            border: 2px solid #111;
+
+            background: #d9a441;
+
+            opacity: .96;
+
+        }
+
+        .front {
+            transform:
+                translateZ(17px);
+        }
+
+        .back {
+            transform:
+                rotateY(180deg)
+                translateZ(17px);
+        }
+
+        .right {
+            transform:
+                rotateY(90deg)
+                translateZ(17px);
+
+            background: #b78327;
+        }
+
+        .left {
+            transform:
+                rotateY(-90deg)
+                translateZ(17px);
+
+            background: #e6bd65;
+        }
+
+        .top {
+            transform:
+                rotateX(90deg)
+                translateZ(17px);
+
+            background: #f1d38d;
+        }
+
+        .bottom {
+            transform:
+                rotateX(-90deg)
+                translateZ(17px);
+
+            background: #8c641e;
+        }
+
+
+        /* ================================
+           CAMERA BUTTON
+        ================================= */
+
+        .camera-button {
+
+            width: 62px;
+            height: 62px;
+
+            border: none;
+
+            border-radius: 17px;
+
+            background: white;
+
+            color: #111;
+
+            font-size: 28px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,.4);
+
+            pointer-events: auto;
+
+            touch-action: manipulation;
+        }
+
+        .camera-button:active {
+
+            transform: scale(.90);
+
+        }
+
+
+        /* ================================
+           FLASH
+        ================================= */
+
+        .flash {
+
+            position: absolute;
+
+            inset: 0;
+
+            z-index: 100;
+
+            background: white;
+
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
+        .flash.active {
+
+            animation:
+                cameraFlash .25s ease;
+
+        }
+
+        @keyframes cameraFlash {
+
+            0% {
+                opacity: 0;
+            }
+
+            35% {
+                opacity: .85;
+            }
+
+            100% {
+                opacity: 0;
+            }
+
+        }
+
+
+        /* ================================
+           STATUS
+        ================================= */
+
+        .status {
+
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            z-index: 80;
+
+            display: none;
+
+            width: max-content;
+
+            max-width: 85%;
+
+            padding: 13px 17px;
+
+            border-radius: 15px;
+
+            background:
+                rgba(0,0,0,.88);
+
+            color: white;
+
+            font-size: 13px;
+
+            text-align: center;
+
+        }
+
+        .status.show {
+            display: block;
+        }
+
+
+        /* ================================
+           HELP
+        ================================= */
+
+        .help {
+
+            position: absolute;
+
+            left: 50%;
+
+            bottom:
+                calc(
+                    92px +
+                    env(safe-area-inset-bottom, 0px)
+                );
+
+            transform:
+                translateX(-50%);
+
+            z-index: 15;
+
+            color:
+                rgba(255,255,255,.72);
+
+            font-size: 11px;
+
+            white-space: nowrap;
+
+            pointer-events: none;
+        }
+
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 500px) {
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            header p {
+                font-size: 11px;
+            }
+
+            .cube-button,
+            .camera-button {
+
+                width: 56px;
+                height: 56px;
+
+                border-radius: 15px;
+            }
+
+            .cube-scene {
+
+                transform:
+                    scale(.85);
+
+            }
+
+            .ar-button {
+
+                bottom: 110px;
+
+                padding:
+                    13px 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =================================
+         HEADER
+    ================================== -->
+
+    <header>
+
+        <h1>Mayan Sculpture</h1>
+
+        <p>
+            Explore the sculpture in augmented reality
+        </p>
+
+    </header>
+
+
+    <!-- =================================
+         VIEWER
+    ================================== -->
+
+    <div class="viewer">
+
+
+        <model-viewer
+
+            id="model"
+
+            src="./escultura.glb"
+
+            alt="Mayan sculpture"
+
+            ar
+
+            ar-modes="webxr scene-viewer quick-look"
+
+            camera-controls
+
+            touch-action="none"
+
+            interaction-prompt="auto"
+
+            shadow-intensity="1"
+
+            shadow-softness="0.7"
+
+            exposure="1"
+
+            environment-image="neutral"
+
+            camera-orbit="0deg 75deg 3m"
+
+            min-camera-orbit="auto 10deg 0.6m"
+
+            max-camera-orbit="auto 170deg 10m"
+
+            field-of-view="30deg"
+
+            loading="eager">
+
+
+            <!-- =============================
+                 AR BUTTON
+            ============================== -->
+
+            <button
+
+                slot="ar-button"
+
+                id="enterAR"
+
+                class="ar-button">
+
+                📱 VIEW IN MY SPACE
+
+            </button>
+
+
+        </model-viewer>
+
+
+        <!-- =================================
+             BOTTOM CONTROLS
+        ================================== -->
+
+        <div class="bottom-controls">
+
+
+            <!-- =============================
+                 ROTATION CUBE
+            ============================== -->
+
+            <button
+
+                id="cubeButton"
+
+                class="cube-button"
+
+                aria-label="Rotate sculpture"
+
+                title="Rotate sculpture">
+
+
+                <div class="cube-scene">
+
+                    <div
+                        id="cube"
+                        class="cube">
+
+                        <div class="face front"></div>
+
+                        <div class="face back"></div>
+
+                        <div class="face right"></div>
+
+                        <div class="face left"></div>
+
+                        <div class="face top"></div>
+
+                        <div class="face bottom"></div>
+
+                    </div>
+
+                </div>
+
+
+            </button>
+
+
+            <!-- =============================
+                 CAMERA
+            ============================== -->
+
+            <button
+
+                id="cameraButton"
+
+                class="camera-button"
+
+                aria-label="Take photo"
+
+                title="Take photo">
+
+                📷
+
+            </button>
+
+
+        </div>
+
+
+        <!-- FLASH -->
+
+        <div
+            id="flash"
+            class="flash">
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="status"
+            class="status">
+        </div>
+
+
+        <!-- HELP -->
+
+        <div class="help">
+
+            Drag to rotate · Pinch to zoom
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    /* =================================
+       ELEMENTS
+    ================================= */
+
+    const model =
+        document.getElementById("model");
+
+    const cubeButton =
+        document.getElementById("cubeButton");
+
+    const cube =
+        document.getElementById("cube");
+
+    const cameraButton =
+        document.getElementById("cameraButton");
+
+    const flash =
+        document.getElementById("flash");
+
+    const status =
+        document.getElementById("status");
+
+
+    /* =================================
+       CAMERA DEFAULT
+    ================================= */
+
+    const DEFAULT_ORBIT =
+        "0deg 75deg 3m";
+
+
+    /* =================================
+       STATUS
+    ================================= */
+
+    function showStatus(
+        message,
+        duration = 2500
+    ) {
+
+        status.textContent =
+            message;
+
+        status.classList.add(
+            "show"
+        );
+
+        clearTimeout(
+            showStatus.timer
+        );
+
+        showStatus.timer =
+            setTimeout(
+                () => {
+
+                    status.classList.remove(
+                        "show"
+                    );
+
+                },
+                duration
+            );
+
+    }
+
+
+    /* =================================
+       ROTATION
+    ================================= */
+
+    function rotateModel(
+        horizontal,
+        vertical
+    ) {
+
+        const orbit =
+            model.getCameraOrbit();
+
+        if (!orbit) {
+            return;
+        }
+
+
+        let theta =
+            orbit.theta +
+            horizontal;
+
+
+        let phi =
+            orbit.phi +
+            vertical;
+
+
+        const minPhi =
+            10 *
+            Math.PI /
+            180;
+
+
+        const maxPhi =
+            170 *
+            Math.PI /
+            180;
+
+
+        phi =
+            Math.max(
+                minPhi,
+                Math.min(
+                    maxPhi,
+                    phi
+                )
+            );
+
+
+        model.cameraOrbit =
+            `${theta}rad ` +
+            `${phi}rad ` +
+            `${orbit.radius}m`;
+
+    }
+
+
+    /* =================================
+       3D CUBE DRAG ROTATION
+    ================================= */
+
+    let dragging = false;
+
+    let lastX = 0;
+
+    let lastY = 0;
+
+    let cubeX = -25;
+
+    let cubeY = 35;
+
+
+    function startCubeDrag(event) {
+
+        dragging = true;
+
+        const point =
+            event.touches
+                ? event.touches[0]
+                : event;
+
+        lastX =
+            point.clientX;
+
+        lastY =
+            point.clientY;
+
+        cubeButton.setPointerCapture?.(
+            event.pointerId
+        );
+
+    }
+
+
+    function moveCubeDrag(event) {
+
+        if (!dragging) {
+            return;
+        }
+
+        const point =
+            event.touches
+                ? event.touches[0]
+                : event;
+
+
+        const dx =
+            point.clientX -
+            lastX;
+
+
+        const dy =
+            point.clientY -
+            lastY;
+
+
+        lastX =
+            point.clientX;
+
+        lastY =
+            point.clientY;
+
+
+        /*
+         * Rotate the real sculpture.
+         */
+
+        rotateModel(
+            dx * 0.01,
+            dy * 0.01
+        );
+
+
+        /*
+         * Rotate the visual cube.
+         */
+
+        cubeY += dx * 0.7;
+
+        cubeX -= dy * 0.7;
+
+
+        cubeX =
+            Math.max(
+                -85,
+                Math.min(
+                    85,
+                    cubeX
+                )
+            );
+
+
+        cube.style.transform =
+            `rotateX(${cubeX}deg)
+             rotateY(${cubeY}deg)`;
+
+    }
+
+
+    function stopCubeDrag() {
+
+        dragging = false;
+
+    }
+
+
+    cubeButton.addEventListener(
+        "pointerdown",
+        startCubeDrag
+    );
+
+
+    cubeButton.addEventListener(
+        "pointermove",
+        moveCubeDrag
+    );
+
+
+    cubeButton.addEventListener(
+        "pointerup",
+        stopCubeDrag
+    );
+
+
+    cubeButton.addEventListener(
+        "pointercancel",
+        stopCubeDrag
+    );
+
+
+    cubeButton.addEventListener(
+        "pointerleave",
+        stopCubeDrag
+    );
+
+
+    /* =================================
+       PHOTO
+    ================================= */
+
+    async function takePhoto() {
+
+        /*
+         * A model-viewer screenshot captures
+         * the 3D model, not the native AR
+         * camera composition.
+         *
+         * This is intentional: native
+         * Scene Viewer / Quick Look do not
+         * expose their camera frames to
+         * ordinary page JavaScript.
+         */
+
+        try {
+
+            if (
+                typeof model.toBlob !==
+                "function"
+            ) {
+
+                throw new Error(
+                    "Screenshot unavailable"
+                );
+
+            }
+
+
+            const blob =
+                await model.toBlob({
+
+                    idealAspect: 1,
+
+                    mimeType:
+                        "image/png"
+
+                });
+
+
+            if (!blob) {
+
+                throw new Error(
+                    "No image"
+                );
+
+            }
+
+
+            /* FLASH */
+
+            flash.classList.remove(
+                "active"
+            );
+
+            void flash.offsetWidth;
+
+            flash.classList.add(
+                "active"
+            );
+
+
+            /* DOWNLOAD */
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href = url;
+
+
+            link.download =
+                `mayan-sculpture-${Date.now()}.png`;
+
+
+            document.body.appendChild(
+                link
+            );
+
+
+            link.click();
+
+
+            link.remove();
+
+
+            setTimeout(
+                () => {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                },
+                2000
+            );
+
+
+            showStatus(
+                "Photo saved"
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showStatus(
+                "Photo capture is not available.",
+                4000
+            );
+
+        }
+
+    }
+
+
+    cameraButton.addEventListener(
+        "click",
+        takePhoto
+    );
+
+
+    /* =================================
+       MODEL LOADED
+    ================================= */
+
+    model.addEventListener(
+        "load",
+        () => {
+
+            model.cameraOrbit =
+                DEFAULT_ORBIT;
+
+        }
+    );
+
+
+    /* =================================
+       MODEL ERROR
+    ================================= */
+
+    model.addEventListener(
+        "error",
+        () => {
+
+            showStatus(
+                "Unable to load escultura.glb",
+                5000
+            );
+
+        }
+    );
+
+
+    /* =================================
+       AR STATUS
+    ================================= */
+
+    model.addEventListener(
+        "ar-status",
+        event => {
+
+            console.log(
+                "AR status:",
+                event.detail
+            );
+
+        }
+    );
+
+
+    /* =================================
+       WEBXR CHECK
+    ================================= */
+
+    if (
+        navigator.xr &&
+        navigator.xr.isSessionSupported
+    ) {
+
+        navigator.xr
+            .isSessionSupported(
+                "immersive-ar"
+            )
+            .then(
+                supported => {
+
+                    console.log(
+                        "WebXR immersive AR:",
+                        supported
+                    );
+
+                }
+            )
+            .catch(
+                error => {
+
+                    console.log(
+                        "WebXR unavailable:",
+                        error
+                    );
+
+                }
+            );
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
