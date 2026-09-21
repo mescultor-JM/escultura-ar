@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -11,742 +13,1665 @@
              user-scalable=no"
   >
 
-  <title>Escultura AR</title>
+  <title>AR Sculpture</title>
 
   <style>
+
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html,
     body {
+
       margin: 0;
+
       width: 100%;
       height: 100%;
+
       overflow: hidden;
+
       background: transparent;
-    }
 
-    #controls {
-      position: fixed;
-      bottom: 25px;
-      left: 20px;
-      right: 20px;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      z-index: 100;
-      pointer-events: none;
-    }
-
-    #cube {
-      width: 110px;
-      height: 110px;
-
-      background: rgba(0,0,0,.55);
-      border-radius: 15px;
-
-      pointer-events: auto;
       touch-action: none;
     }
 
-    #photo {
-      width: 70px;
-      height: 70px;
 
-      border: 2px solid white;
-      border-radius: 14px;
+    /* =========================================
+       INFORMATION
+    ========================================= */
 
-      background: rgba(0,0,0,.6);
-      color: white;
+    #message {
 
-      font-size: 30px;
-
-      pointer-events: auto;
-    }
-
-    #info {
       position: fixed;
+
       top: 20px;
       left: 50%;
 
-      transform: translateX(-50%);
+      transform:
+        translateX(-50%);
+
+      z-index: 1000;
+
+      padding:
+        10px 18px;
+
+      border-radius: 22px;
+
+      background:
+        rgba(0, 0, 0, .65);
 
       color: white;
-      background: rgba(0,0,0,.6);
 
-      padding: 10px 15px;
-      border-radius: 20px;
+      font-size: 14px;
 
-      z-index: 100;
+      text-align: center;
+
+      white-space: nowrap;
+
+      pointer-events: none;
     }
+
+
+    /* =========================================
+       BOTTOM CONTROLS
+    ========================================= */
+
+    #arControls {
+
+      position: fixed;
+
+      left: 0;
+      right: 0;
+
+      bottom: 24px;
+
+      padding:
+        0 20px;
+
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        flex-end;
+
+      z-index: 2000;
+
+      pointer-events: none;
+    }
+
+
+    /* =========================================
+       ROTATION CONTROL
+    ========================================= */
+
+    #rotationControl {
+
+      position: relative;
+
+      width: 120px;
+      height: 120px;
+
+      pointer-events: auto;
+
+      touch-action: none;
+
+      user-select: none;
+
+      -webkit-user-select: none;
+
+      perspective:
+        500px;
+    }
+
+
+    /* =========================================
+       3D CUBE
+    ========================================= */
+
+    #cube {
+
+      position: absolute;
+
+      width: 70px;
+      height: 70px;
+
+      left: 25px;
+      top: 25px;
+
+      transform-style:
+        preserve-3d;
+
+      transform:
+        rotateX(-25deg)
+        rotateY(35deg);
+
+      transition:
+        transform .05s linear;
+    }
+
+
+    .face {
+
+      position: absolute;
+
+      width: 70px;
+      height: 70px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      border:
+        2px solid
+        rgba(255,255,255,.9);
+
+      color: white;
+
+      font-size: 17px;
+
+      font-weight: bold;
+
+      box-shadow:
+        inset 0 0 15px
+        rgba(255,255,255,.15);
+
+      backface-visibility:
+        visible;
+    }
+
+
+    /* X AXIS - RED */
+
+    .front {
+
+      background:
+        rgba(229,57,53,.82);
+
+      transform:
+        translateZ(35px);
+    }
+
+
+    .back {
+
+      background:
+        rgba(183,28,28,.72);
+
+      transform:
+        rotateY(180deg)
+        translateZ(35px);
+    }
+
+
+    /* Y AXIS - GREEN */
+
+    .right {
+
+      background:
+        rgba(67,160,71,.82);
+
+      transform:
+        rotateY(90deg)
+        translateZ(35px);
+    }
+
+
+    .left {
+
+      background:
+        rgba(27,94,32,.72);
+
+      transform:
+        rotateY(-90deg)
+        translateZ(35px);
+    }
+
+
+    /* Z AXIS - BLUE */
+
+    .top {
+
+      background:
+        rgba(30,136,229,.82);
+
+      transform:
+        rotateX(90deg)
+        translateZ(35px);
+    }
+
+
+    .bottom {
+
+      background:
+        rgba(13,71,161,.72);
+
+      transform:
+        rotateX(-90deg)
+        translateZ(35px);
+    }
+
+
+    /* =========================================
+       AXIS LABELS
+    ========================================= */
+
+    .axis {
+
+      position: absolute;
+
+      width: 25px;
+      height: 25px;
+
+      border-radius: 50%;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      color: white;
+
+      font-size: 12px;
+
+      font-weight: bold;
+
+      z-index: 20;
+
+      pointer-events: none;
+
+      border:
+        1px solid
+        rgba(255,255,255,.7);
+    }
+
+
+    .axis-x {
+
+      right: 0;
+      top: 47px;
+
+      background:
+        #e53935;
+    }
+
+
+    .axis-y {
+
+      left: 3px;
+      top: 7px;
+
+      background:
+        #43a047;
+    }
+
+
+    .axis-z {
+
+      left: 3px;
+      bottom: 7px;
+
+      background:
+        #1e88e5;
+    }
+
+
+    /* =========================================
+       CAMERA BUTTON
+    ========================================= */
+
+    #photoButton {
+
+      width: 70px;
+      height: 70px;
+
+      padding: 0;
+
+      border:
+        2px solid
+        rgba(255,255,255,.95);
+
+      border-radius: 14px;
+
+      background:
+        rgba(0,0,0,.65);
+
+      color: white;
+
+      font-size: 31px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      pointer-events: auto;
+
+      touch-action: manipulation;
+
+      backdrop-filter:
+        blur(8px);
+
+      -webkit-backdrop-filter:
+        blur(8px);
+
+      box-shadow:
+        0 4px 15px
+        rgba(0,0,0,.3);
+    }
+
+
+    #photoButton:active {
+
+      transform:
+        scale(.90);
+    }
+
+
+    /* =========================================
+       LABELS
+    ========================================= */
+
+    #rotationLabel {
+
+      position: absolute;
+
+      bottom: -20px;
+
+      left: 50%;
+
+      transform:
+        translateX(-50%);
+
+      color: white;
+
+      font-size: 11px;
+
+      font-weight: bold;
+
+      text-shadow:
+        0 1px 4px black;
+
+      pointer-events: none;
+
+      white-space: nowrap;
+    }
+
+
+    #photoLabel {
+
+      position: absolute;
+
+      bottom: -20px;
+
+      right: 3px;
+
+      color: white;
+
+      font-size: 11px;
+
+      font-weight: bold;
+
+      text-shadow:
+        0 1px 4px black;
+
+      pointer-events: none;
+
+      white-space: nowrap;
+    }
+
+
+    /* =========================================
+       SMALL SCREENS
+    ========================================= */
+
+    @media(max-width: 480px) {
+
+      #arControls {
+
+        bottom: 20px;
+
+        padding:
+          0 15px;
+      }
+
+      #rotationControl {
+
+        width: 105px;
+        height: 105px;
+      }
+
+      #cube {
+
+        width: 62px;
+        height: 62px;
+
+        left: 21px;
+        top: 21px;
+      }
+
+      .face {
+
+        width: 62px;
+        height: 62px;
+      }
+
+      .axis {
+
+        width: 22px;
+        height: 22px;
+
+        font-size: 10px;
+      }
+
+      #photoButton {
+
+        width: 64px;
+        height: 64px;
+
+        font-size: 28px;
+      }
+
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
-  <div id="info">
-    Pulsa Enter AR y apunta al suelo
+
+<!-- =========================================
+     MESSAGE
+========================================= -->
+
+<div id="message">
+  Point your camera at a flat surface
+</div>
+
+
+<!-- =========================================
+     AR CONTROLS
+========================================= -->
+
+<div id="arControls">
+
+
+  <!-- =======================================
+       ROTATION CUBE
+  ======================================== -->
+
+  <div id="rotationControl">
+
+    <div id="cube">
+
+      <div class="face front">
+        X
+      </div>
+
+      <div class="face back">
+        X
+      </div>
+
+      <div class="face right">
+        Y
+      </div>
+
+      <div class="face left">
+        Y
+      </div>
+
+      <div class="face top">
+        Z
+      </div>
+
+      <div class="face bottom">
+        Z
+      </div>
+
+    </div>
+
+
+    <div class="axis axis-x">
+      X
+    </div>
+
+    <div class="axis axis-y">
+      Y
+    </div>
+
+    <div class="axis axis-z">
+      Z
+    </div>
+
+
+    <div id="rotationLabel">
+      ROTATE
+    </div>
+
   </div>
 
-  <div id="controls">
 
-    <canvas
-      id="cube"
-      width="110"
-      height="110">
-    </canvas>
+  <!-- =======================================
+       PHOTO
+  ======================================== -->
 
-    <button id="photo">
-      📷
-    </button>
+  <button
+    id="photoButton"
+    aria-label="Take Photo">
 
-  </div>
+    📷
 
+  </button>
 
-  <script type="module">
-
-    import * as THREE from
-      'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-
-    import { GLTFLoader } from
-      'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
-
-    import { ARButton } from
-      'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/webxr/ARButton.js';
+</div>
 
 
-    // ========================================
-    // THREE
-    // ========================================
-
-    const scene =
-      new THREE.Scene();
+<script type="module">
 
 
-    const camera =
-      new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth /
-        window.innerHeight,
-        0.01,
-        100
-      );
+/* ==================================================
+   IMPORT THREE.JS
+================================================== */
+
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 
 
-    const renderer =
-      new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-        preserveDrawingBuffer: true
-      });
+import { GLTFLoader } from
+'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
 
 
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
+import { ARButton } from
+'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/webxr/ARButton.js';
+
+
+
+/* ==================================================
+   SCENE
+================================================== */
+
+const scene =
+new THREE.Scene();
+
+
+const camera =
+new THREE.PerspectiveCamera(
+
+  70,
+
+  window.innerWidth /
+  window.innerHeight,
+
+  0.01,
+
+  100
+
+);
+
+
+
+/* ==================================================
+   RENDERER
+================================================== */
+
+const renderer =
+new THREE.WebGLRenderer({
+
+  antialias: true,
+
+  alpha: true,
+
+  preserveDrawingBuffer: true
+
+});
+
+
+renderer.setPixelRatio(
+
+  Math.min(
+    window.devicePixelRatio,
+    2
+  )
+
+);
+
+
+renderer.setSize(
+
+  window.innerWidth,
+
+  window.innerHeight
+
+);
+
+
+renderer.xr.enabled =
+true;
+
+
+renderer.outputColorSpace =
+THREE.SRGBColorSpace;
+
+
+document.body.appendChild(
+  renderer.domElement
+);
+
+
+
+/* ==================================================
+   AR BUTTON
+================================================== */
+
+const arButton =
+ARButton.createButton(
+
+  renderer,
+
+  {
+
+    requiredFeatures: [
+
+      'hit-test'
+
+    ],
+
+    optionalFeatures: [
+
+      'dom-overlay'
+
+    ],
+
+    domOverlay: {
+
+      root:
+        document.body
+
+    }
+
+  }
+
+);
+
+
+document.body.appendChild(
+  arButton
+);
+
+
+
+/* ==================================================
+   LIGHTS
+================================================== */
+
+const hemisphereLight =
+new THREE.HemisphereLight(
+
+  0xffffff,
+
+  0x555555,
+
+  3
+
+);
+
+
+scene.add(
+  hemisphereLight
+);
+
+
+const directionalLight =
+new THREE.DirectionalLight(
+
+  0xffffff,
+
+  2.5
+
+);
+
+
+directionalLight.position.set(
+
+  2,
+  4,
+  2
+
+);
+
+
+scene.add(
+  directionalLight
+);
+
+
+
+/* ==================================================
+   LOAD SCULPTURE
+================================================== */
+
+let sculpture =
+null;
+
+
+const loader =
+new GLTFLoader();
+
+
+loader.load(
+
+  './escultura.glb',
+
+  (gltf) => {
+
+    sculpture =
+      gltf.scene;
+
+
+    /*
+       CHANGE THIS VALUE
+       if your sculpture is
+       too big or too small.
+    */
+
+    sculpture.scale.setScalar(
+      0.5
     );
 
-    renderer.setPixelRatio(
-      window.devicePixelRatio
-    );
 
-    renderer.xr.enabled = true;
-
-    document.body.appendChild(
-      renderer.domElement
-    );
-
-
-    // ========================================
-    // AR
-    // ========================================
-
-    const arButton =
-      ARButton.createButton(
-        renderer,
-        {
-          requiredFeatures: [
-            'hit-test'
-          ],
-
-          optionalFeatures: [
-            'dom-overlay'
-          ],
-
-          domOverlay: {
-            root: document.body
-          }
-        }
-      );
-
-    document.body.appendChild(
-      arButton
-    );
-
-
-    // ========================================
-    // LUZ
-    // ========================================
-
-    const light =
-      new THREE.HemisphereLight(
-        0xffffff,
-        0x444444,
-        3
-      );
-
-    scene.add(light);
-
-
-    // ========================================
-    // ESCULTURA
-    // ========================================
-
-    let sculpture = null;
-
-    const loader =
-      new GLTFLoader();
-
-
-    loader.load(
-      './escultura.glb',
-
-      (gltf) => {
-
-        sculpture =
-          gltf.scene;
-
-        sculpture.scale.set(
-          0.5,
-          0.5,
-          0.5
-        );
-
-        sculpture.visible =
-          false;
-
-        scene.add(
-          sculpture
-        );
-
-      },
-
-      undefined,
-
-      (error) => {
-
-        console.error(
-          'Error cargando escultura:',
-          error
-        );
-
-      }
-    );
-
-
-    // ========================================
-    // RETÍCULA
-    // ========================================
-
-    const reticle =
-      new THREE.Mesh(
-
-        new THREE.RingGeometry(
-          0.08,
-          0.1,
-          32
-        ).rotateX(
-          -Math.PI / 2
-        ),
-
-        new THREE.MeshBasicMaterial({
-          color: 0xffffff
-        })
-
-      );
-
-    reticle.matrixAutoUpdate =
+    sculpture.visible =
       false;
 
-    reticle.visible =
-      false;
 
-    scene.add(
-      reticle
-    );
-
-
-    // ========================================
-    // CONTROLLER
-    // ========================================
-
-    const controller =
-      renderer.xr.getController(0);
-
-    scene.add(
-      controller
-    );
-
-
-    let hitTestSource =
-      null;
-
-    let hitTestRequested =
-      false;
-
-
-    controller.addEventListener(
-      'select',
-      () => {
+    sculpture.traverse(
+      (object) => {
 
         if (
-          !reticle.visible ||
-          !sculpture
+          object.isMesh
         ) {
-          return;
+
+          object.castShadow =
+            true;
+
+          object.receiveShadow =
+            true;
+
         }
-
-        sculpture.position.setFromMatrixPosition(
-          reticle.matrix
-        );
-
-        sculpture.visible =
-          true;
-
-        document.getElementById(
-          'info'
-        ).textContent =
-          'Arrastra el cubo para girar';
 
       }
     );
 
 
-    // ========================================
-    // CUBO DE ROTACIÓN
-    // ========================================
+    scene.add(
+      sculpture
+    );
 
-    const cube =
-      document.getElementById(
-        'cube'
+
+    document.getElementById(
+      'message'
+    ).textContent =
+      'Point your camera at a flat surface';
+
+  },
+
+  undefined,
+
+  (error) => {
+
+    console.error(
+      'GLB loading error:',
+      error
+    );
+
+
+    document.getElementById(
+      'message'
+    ).textContent =
+      'Error loading sculpture';
+
+  }
+
+);
+
+
+
+/* ==================================================
+   RETICLE
+================================================== */
+
+const reticle =
+new THREE.Mesh(
+
+  new THREE.RingGeometry(
+
+    0.08,
+    0.10,
+    32
+
+  ).rotateX(
+
+    -Math.PI / 2
+
+  ),
+
+  new THREE.MeshBasicMaterial({
+
+    color:
+      0xffffff
+
+  })
+
+);
+
+
+reticle.matrixAutoUpdate =
+false;
+
+
+reticle.visible =
+false;
+
+
+scene.add(
+  reticle
+);
+
+
+
+/* ==================================================
+   XR CONTROLLER
+================================================== */
+
+const controller =
+renderer.xr.getController(0);
+
+
+scene.add(
+  controller
+);
+
+
+let hitTestSource =
+null;
+
+
+let hitTestSourceRequested =
+false;
+
+
+
+/* ==================================================
+   PLACE SCULPTURE
+================================================== */
+
+controller.addEventListener(
+
+  'select',
+
+  () => {
+
+    if (
+      !reticle.visible ||
+      !sculpture
+    ) {
+
+      return;
+
+    }
+
+
+    sculpture.position.setFromMatrixPosition(
+
+      reticle.matrix
+
+    );
+
+
+    sculpture.visible =
+      true;
+
+
+    document.getElementById(
+      'message'
+    ).textContent =
+      'Drag the cube to rotate';
+
+  }
+
+);
+
+
+
+/* ==================================================
+   ROTATION STATE
+================================================== */
+
+let rotationX =
+-25;
+
+
+let rotationY =
+35;
+
+
+let rotationZ =
+0;
+
+
+
+/* ==================================================
+   UPDATE CUBE
+================================================== */
+
+function updateCube() {
+
+  const cube =
+    document.getElementById(
+      'cube'
+    );
+
+
+  cube.style.transform =
+
+    `rotateX(${rotationX}deg)
+     rotateY(${rotationY}deg)
+     rotateZ(${rotationZ}deg)`;
+
+}
+
+
+
+updateCube();
+
+
+
+/* ==================================================
+   APPLY ROTATION TO SCULPTURE
+================================================== */
+
+function updateSculptureRotation() {
+
+  if (
+    !sculpture
+  ) {
+
+    return;
+
+  }
+
+
+  sculpture.rotation.x =
+
+    THREE.MathUtils.degToRad(
+      rotationX
+    );
+
+
+  sculpture.rotation.y =
+
+    THREE.MathUtils.degToRad(
+      rotationY
+    );
+
+
+  sculpture.rotation.z =
+
+    THREE.MathUtils.degToRad(
+      rotationZ
+    );
+
+}
+
+
+
+/* ==================================================
+   CUBE DRAG
+================================================== */
+
+const rotationControl =
+document.getElementById(
+  'rotationControl'
+);
+
+
+let dragging =
+false;
+
+
+let lastX =
+0;
+
+
+let lastY =
+0;
+
+
+rotationControl.addEventListener(
+
+  'pointerdown',
+
+  (event) => {
+
+    dragging =
+      true;
+
+
+    lastX =
+      event.clientX;
+
+
+    lastY =
+      event.clientY;
+
+
+    rotationControl.setPointerCapture(
+
+      event.pointerId
+
+    );
+
+  }
+
+);
+
+
+
+rotationControl.addEventListener(
+
+  'pointermove',
+
+  (event) => {
+
+    if (
+      !dragging
+    ) {
+
+      return;
+
+    }
+
+
+    const dx =
+      event.clientX -
+      lastX;
+
+
+    const dy =
+      event.clientY -
+      lastY;
+
+
+    lastX =
+      event.clientX;
+
+
+    lastY =
+      event.clientY;
+
+
+    /*
+       Horizontal drag
+       = Y rotation
+    */
+
+    rotationY +=
+      dx * 0.7;
+
+
+    /*
+       Vertical drag
+       = X rotation
+    */
+
+    rotationX +=
+      dy * 0.7;
+
+
+    updateCube();
+
+    updateSculptureRotation();
+
+  }
+
+);
+
+
+
+rotationControl.addEventListener(
+
+  'pointerup',
+
+  (event) => {
+
+    dragging =
+      false;
+
+
+    try {
+
+      rotationControl.releasePointerCapture(
+
+        event.pointerId
+
       );
 
-    const ctx =
-      cube.getContext(
-        '2d'
-      );
+    } catch {}
+
+  }
+
+);
 
 
-    let cubeX = -0.4;
-    let cubeY = 0.5;
 
-    let dragging = false;
+rotationControl.addEventListener(
 
-    let lastX = 0;
-    let lastY = 0;
+  'pointercancel',
 
+  () => {
 
-    function drawCube() {
+    dragging =
+      false;
 
-      ctx.clearRect(
-        0,
-        0,
-        110,
-        110
-      );
+  }
 
-      const cx = 55;
-      const cy = 55;
-      const size = 32;
+);
 
 
-      const vertices = [
 
-        [-1,-1,-1],
-        [ 1,-1,-1],
-        [ 1, 1,-1],
-        [-1, 1,-1],
+/* ==================================================
+   Z ROTATION
+================================================== */
 
-        [-1,-1, 1],
-        [ 1,-1, 1],
-        [ 1, 1, 1],
-        [-1, 1, 1]
+/*
+   Two-finger rotation over the cube
+   controls the Z axis.
+*/
 
-      ];
-
-
-      function project(v) {
-
-        let [x,y,z] = v;
+let pointerOne =
+null;
 
 
-        // X
-
-        const cosX =
-          Math.cos(cubeX);
-
-        const sinX =
-          Math.sin(cubeX);
-
-        const yy =
-          y * cosX -
-          z * sinX;
-
-        const zz =
-          y * sinX +
-          z * cosX;
-
-        y = yy;
-        z = zz;
+let pointerTwo =
+null;
 
 
-        // Y
-
-        const cosY =
-          Math.cos(cubeY);
-
-        const sinY =
-          Math.sin(cubeY);
-
-        const xx =
-          x * cosY +
-          z * sinY;
-
-        x = xx;
+let previousAngle =
+null;
 
 
-        return [
-          cx + x * size,
-          cy + y * size
-        ];
+
+rotationControl.addEventListener(
+
+  'pointerdown',
+
+  (event) => {
+
+    if (
+      pointerOne === null
+    ) {
+
+      pointerOne = {
+
+        id:
+          event.pointerId,
+
+        x:
+          event.clientX,
+
+        y:
+          event.clientY
+
+      };
+
+    }
+
+    else if (
+      pointerTwo === null
+    ) {
+
+      pointerTwo = {
+
+        id:
+          event.pointerId,
+
+        x:
+          event.clientX,
+
+        y:
+          event.clientY
+
+      };
+
+    }
+
+  }
+
+);
+
+
+
+rotationControl.addEventListener(
+
+  'pointermove',
+
+  (event) => {
+
+    if (
+      pointerOne &&
+      event.pointerId ===
+      pointerOne.id
+    ) {
+
+      pointerOne.x =
+        event.clientX;
+
+      pointerOne.y =
+        event.clientY;
+
+    }
+
+
+    if (
+      pointerTwo &&
+      event.pointerId ===
+      pointerTwo.id
+    ) {
+
+      pointerTwo.x =
+        event.clientX;
+
+      pointerTwo.y =
+        event.clientY;
+
+    }
+
+
+    if (
+      pointerOne &&
+      pointerTwo
+    ) {
+
+      const dx =
+
+        pointerTwo.x -
+        pointerOne.x;
+
+
+      const dy =
+
+        pointerTwo.y -
+        pointerOne.y;
+
+
+      const angle =
+
+        Math.atan2(
+          dy,
+          dx
+        );
+
+
+      if (
+        previousAngle !== null
+      ) {
+
+        let delta =
+
+          angle -
+          previousAngle;
+
+
+        if (
+          delta > Math.PI
+        ) {
+
+          delta -=
+            Math.PI * 2;
+
+        }
+
+
+        if (
+          delta < -Math.PI
+        ) {
+
+          delta +=
+            Math.PI * 2;
+
+        }
+
+
+        rotationZ +=
+
+          THREE.MathUtils.radToDeg(
+            delta
+          );
+
+
+        updateCube();
+
+        updateSculptureRotation();
 
       }
 
 
-      const p =
-        vertices.map(project);
+      previousAngle =
+        angle;
+
+    }
+
+  }
+
+);
 
 
-      const faces = [
 
-        [0,1,2,3,'#e53935'],
-        [4,5,6,7,'#1e88e5'],
-        [0,4,7,3,'#43a047'],
-        [1,5,6,2,'#ff9800'],
-        [3,2,6,7,'#9c27b0'],
-        [0,1,5,4,'#00acc1']
+rotationControl.addEventListener(
 
-      ];
+  'pointerup',
+
+  (event) => {
+
+    if (
+      pointerOne &&
+      event.pointerId ===
+      pointerOne.id
+    ) {
+
+      pointerOne =
+        null;
+
+    }
 
 
-      for (
-        const face of faces
+    if (
+      pointerTwo &&
+      event.pointerId ===
+      pointerTwo.id
+    ) {
+
+      pointerTwo =
+        null;
+
+    }
+
+
+    if (
+      !pointerOne ||
+      !pointerTwo
+    ) {
+
+      previousAngle =
+        null;
+
+    }
+
+  }
+
+);
+
+
+
+/* ==================================================
+   PHOTO BUTTON
+================================================== */
+
+const photoButton =
+document.getElementById(
+  'photoButton'
+);
+
+
+photoButton.addEventListener(
+
+  'click',
+
+  () => {
+
+    /*
+       Render current scene.
+    */
+
+    renderer.render(
+      scene,
+      camera
+    );
+
+
+    const image =
+
+      renderer.domElement
+        .toDataURL(
+          'image/png'
+        );
+
+
+    const link =
+      document.createElement(
+        'a'
+      );
+
+
+    link.download =
+      `AR-Sculpture-${Date.now()}.png`;
+
+
+    link.href =
+      image;
+
+
+    link.click();
+
+  }
+
+);
+
+
+
+/* ==================================================
+   WEBXR HIT TEST
+================================================== */
+
+renderer.setAnimationLoop(
+
+  (
+    timestamp,
+    frame
+  ) => {
+
+    if (
+      frame
+    ) {
+
+      const session =
+        renderer.xr.getSession();
+
+
+      const referenceSpace =
+        renderer.xr.getReferenceSpace();
+
+
+      /* -------------------------------------------
+         REQUEST HIT TEST SOURCE
+      ------------------------------------------- */
+
+      if (
+        !hitTestSourceRequested
       ) {
 
-        ctx.beginPath();
+        session
 
-        face.slice(0,4)
-          .forEach(
-            (index,i) => {
+          .requestReferenceSpace(
+            'viewer'
+          )
 
-              const [
-                x,
-                y
-              ] = p[index];
+          .then(
 
-              if (i === 0)
-                ctx.moveTo(x,y);
-              else
-                ctx.lineTo(x,y);
+            (viewerSpace) => {
+
+              session
+
+                .requestHitTestSource({
+
+                  space:
+                    viewerSpace
+
+                })
+
+                .then(
+
+                  (source) => {
+
+                    hitTestSource =
+                      source;
+
+                  }
+
+                );
 
             }
+
           );
 
-        ctx.closePath();
 
-        ctx.fillStyle =
-          face[4];
+        session.addEventListener(
 
-        ctx.globalAlpha =
-          .85;
+          'end',
 
-        ctx.fill();
+          () => {
 
-        ctx.globalAlpha =
-          1;
+            hitTestSource =
+              null;
 
-        ctx.strokeStyle =
-          'white';
 
-        ctx.lineWidth =
-          2;
+            hitTestSourceRequested =
+              false;
 
-        ctx.stroke();
+          }
+
+        );
+
+
+        hitTestSourceRequested =
+          true;
+
+      }
+
+
+      /* -------------------------------------------
+         HIT TEST
+      ------------------------------------------- */
+
+      if (
+        hitTestSource
+      ) {
+
+        const hitResults =
+
+          frame.getHitTestResults(
+
+            hitTestSource
+
+          );
+
+
+        if (
+          hitResults.length > 0
+        ) {
+
+          const hit =
+            hitResults[0];
+
+
+          const pose =
+            hit.getPose(
+
+              referenceSpace
+
+            );
+
+
+          reticle.visible =
+            true;
+
+
+          reticle.matrix.fromArray(
+
+            pose.transform.matrix
+
+          );
+
+        }
+
+        else {
+
+          reticle.visible =
+            false;
+
+        }
 
       }
 
     }
 
 
-    drawCube();
+    renderer.render(
 
+      scene,
+      camera
 
-    // ========================================
-    // ARRASTRAR CUBO
-    // ========================================
-
-    cube.addEventListener(
-      'pointerdown',
-      (event) => {
-
-        dragging = true;
-
-        lastX =
-          event.clientX;
-
-        lastY =
-          event.clientY;
-
-        cube.setPointerCapture(
-          event.pointerId
-        );
-
-      }
     );
 
+  }
 
-    cube.addEventListener(
-      'pointermove',
-      (event) => {
-
-        if (!dragging)
-          return;
+);
 
 
-        const dx =
-          event.clientX -
-          lastX;
 
-        const dy =
-          event.clientY -
-          lastY;
+/* ==================================================
+   RESIZE
+================================================== */
 
+window.addEventListener(
 
-        lastX =
-          event.clientX;
+  'resize',
 
-        lastY =
-          event.clientY;
+  () => {
 
+    camera.aspect =
 
-        cubeY +=
-          dx * 0.01;
-
-        cubeX +=
-          dy * 0.01;
+      window.innerWidth /
+      window.innerHeight;
 
 
-        drawCube();
+    camera.updateProjectionMatrix();
 
 
-        if (sculpture) {
+    renderer.setSize(
 
-          sculpture.rotation.y +=
-            dx * 0.01;
+      window.innerWidth,
+      window.innerHeight
 
-          sculpture.rotation.x +=
-            dy * 0.01;
-
-        }
-
-      }
     );
 
+  }
 
-    cube.addEventListener(
-      'pointerup',
-      () => {
-
-        dragging = false;
-
-      }
-    );
+);
 
 
-    // ========================================
-    // Z
-    // ========================================
-
-    cube.addEventListener(
-      'dblclick',
-      () => {
-
-        if (sculpture) {
-
-          sculpture.rotation.z +=
-            Math.PI / 8;
-
-        }
-
-      }
-    );
-
-
-    // ========================================
-    // HIT TEST
-    // ========================================
-
-    renderer.setAnimationLoop(
-      (
-        timestamp,
-        frame
-      ) => {
-
-        if (frame) {
-
-          const session =
-            renderer.xr.getSession();
-
-          const referenceSpace =
-            renderer.xr.getReferenceSpace();
-
-
-          if (!hitTestRequested) {
-
-            session
-              .requestReferenceSpace(
-                'viewer'
-              )
-              .then(
-                (viewerSpace) => {
-
-                  session
-                    .requestHitTestSource({
-                      space:
-                        viewerSpace
-                    })
-                    .then(
-                      (source) => {
-
-                        hitTestSource =
-                          source;
-
-                      }
-                    );
-
-                }
-              );
-
-
-            hitTestRequested =
-              true;
-
-          }
-
-
-          if (hitTestSource) {
-
-            const results =
-              frame.getHitTestResults(
-                hitTestSource
-              );
-
-
-            if (
-              results.length > 0
-            ) {
-
-              const hit =
-                results[0];
-
-              const pose =
-                hit.getPose(
-                  referenceSpace
-                );
-
-
-              reticle.visible =
-                true;
-
-              reticle.matrix.fromArray(
-                pose.transform.matrix
-              );
-
-            }
-
-          }
-
-        }
-
-
-        renderer.render(
-          scene,
-          camera
-        );
-
-      }
-    );
-
-
-    // ========================================
-    // FOTO
-    // ========================================
-
-    document
-      .getElementById('photo')
-      .addEventListener(
-        'click',
-        () => {
-
-          const image =
-            renderer.domElement
-              .toDataURL(
-                'image/png'
-              );
-
-          const link =
-            document.createElement(
-              'a'
-            );
-
-          link.download =
-            'escultura.png';
-
-          link.href =
-            image;
-
-          link.click();
-
-        }
-      );
-
-
-    // ========================================
-    // RESIZE
-    // ========================================
-
-    window.addEventListener(
-      'resize',
-      () => {
-
-        camera.aspect =
-          window.innerWidth /
-          window.innerHeight;
-
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(
-          window.innerWidth,
-          window.innerHeight
-        );
-
-      }
-    );
-
-  </script>
+</script>
 
 </body>
+
 </html>
