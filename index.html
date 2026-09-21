@@ -2,556 +2,748 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
 
-    <meta name="viewport"
-        content="width=device-width,
-        initial-scale=1.0,
-        maximum-scale=1.0,
-        user-scalable=no,
-        viewport-fit=cover">
+<meta charset="UTF-8">
 
-    <title>Mayan Sculpture AR</title>
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no,
+               viewport-fit=cover">
 
-    <!-- MODEL VIEWER -->
-    <script type="module"
-        src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
-    </script>
+<title>Mayan Sculpture AR</title>
 
-    <style>
+<script type="module"
+src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+</script>
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+<style>
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+/* =====================================================
+   GENERAL
+===================================================== */
 
-            background: #111;
-            color: white;
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
 
-            font-family: Arial, sans-serif;
-        }
+html,
+body{
+    margin:0;
+    padding:0;
 
-        body {
-            touch-action: manipulation;
-        }
+    width:100%;
+    height:100%;
 
-        /* =========================================
-           APP
-        ========================================= */
+    overflow:hidden;
 
-        .app {
-            position: relative;
+    background:#111;
+    color:white;
 
-            width: 100%;
-            height: 100dvh;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
 
-            overflow: hidden;
+body{
+    touch-action:manipulation;
+}
 
-            background: #111;
-        }
+.app{
+    position:relative;
 
+    width:100%;
+    height:100dvh;
 
-        /* =========================================
-           HEADER
-        ========================================= */
+    overflow:hidden;
 
-        header {
-            position: absolute;
+    background:#181818;
+}
 
-            top: env(safe-area-inset-top, 0);
-            left: 0;
 
-            width: 100%;
+/* =====================================================
+   HEADER
+===================================================== */
 
-            z-index: 20;
+header{
 
-            padding: 15px 16px 12px;
+    position:absolute;
 
-            text-align: center;
+    top:
+        env(
+            safe-area-inset-top,
+            0px
+        );
 
-            pointer-events: none;
+    left:0;
 
-            background:
-                linear-gradient(
-                    to bottom,
-                    rgba(0,0,0,.75),
-                    rgba(0,0,0,0)
-                );
-        }
+    width:100%;
 
-        header h1 {
-            margin: 0;
+    z-index:20;
 
-            font-size: 22px;
-            font-weight: 700;
-        }
+    padding:
+        16px
+        16px
+        20px;
 
-        header p {
-            margin: 5px 0 0;
+    text-align:center;
 
-            color: #ccc;
+    pointer-events:none;
 
-            font-size: 12px;
-        }
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.82),
+            rgba(0,0,0,0)
+        );
+}
 
+header h1{
 
-        /* =========================================
-           3D VIEWER
-        ========================================= */
+    margin:0;
 
-        .viewer {
-            position: absolute;
+    font-size:22px;
 
-            inset: 0;
-        }
+    font-weight:700;
 
-        model-viewer {
+    letter-spacing:.2px;
+}
 
-            width: 100%;
-            height: 100%;
+header p{
 
-            background: #181818;
+    margin:5px 0 0;
 
-            --poster-color: #181818;
+    color:#cfcfcf;
 
-            touch-action: none;
+    font-size:12px;
+}
 
-        }
 
+/* =====================================================
+   3D VIEWER
+===================================================== */
 
-        /* =========================================
-           AR BUTTON
-        ========================================= */
+.viewer{
 
-        .ar-button {
+    position:absolute;
 
-            position: absolute;
+    inset:0;
+}
 
-            left: 50%;
-            bottom: 125px;
+model-viewer{
 
-            transform: translateX(-50%);
+    width:100%;
+    height:100%;
 
-            border: none;
+    background:#181818;
 
-            border-radius: 18px;
+    --poster-color:#181818;
 
-            padding: 14px 24px;
+    touch-action:none;
+}
 
-            background: #d9a441;
 
-            color: #111;
+/* =====================================================
+   AR BUTTON
+===================================================== */
 
-            font-size: 15px;
+.ar-button{
 
-            font-weight: 800;
+    position:absolute;
 
-            white-space: nowrap;
+    left:50%;
 
-            box-shadow:
-                0 5px 20px rgba(0,0,0,.45);
+    bottom:
+        calc(
+            112px +
+            env(
+                safe-area-inset-bottom,
+                0px
+            )
+        );
 
-            cursor: pointer;
+    transform:
+        translateX(-50%);
 
-            touch-action: manipulation;
-        }
+    border:0;
 
-        .ar-button:active {
+    border-radius:18px;
 
-            transform:
-                translateX(-50%)
-                scale(.95);
+    padding:
+        14px
+        24px;
 
-        }
+    background:#d9a441;
 
+    color:#111;
 
-        /* =========================================
-           ROTATION CUBE
-        ========================================= */
+    font-size:15px;
 
-        .cube-control {
+    font-weight:800;
 
-            position: absolute;
+    box-shadow:
+        0 5px 22px
+        rgba(0,0,0,.45);
 
-            left: 15px;
+    white-space:nowrap;
 
-            bottom:
-                calc(
-                    18px +
-                    env(safe-area-inset-bottom, 0px)
-                );
+    cursor:pointer;
 
-            z-index: 30;
+    touch-action:manipulation;
+}
 
-            width: 62px;
-            height: 62px;
 
-            border: none;
+/* =====================================================
+   HELP
+===================================================== */
 
-            border-radius: 17px;
+.help{
 
-            background:
-                rgba(0,0,0,.78);
+    position:absolute;
 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+    left:50%;
 
-            color: white;
+    bottom:
+        calc(
+            78px +
+            env(
+                safe-area-inset-bottom,
+                0px
+            )
+        );
 
-            display: flex;
+    transform:
+        translateX(-50%);
 
-            align-items: center;
-            justify-content: center;
+    z-index:15;
 
-            cursor: pointer;
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            .68
+        );
 
-            box-shadow:
-                0 5px 20px rgba(0,0,0,.35);
+    font-size:11px;
 
-            touch-action: manipulation;
+    white-space:nowrap;
 
-        }
+    pointer-events:none;
+}
 
-        .cube-control:active {
 
-            transform: scale(.90);
+/* =====================================================
+   BOTTOM BAR
+===================================================== */
 
-        }
+.bottom-bar{
 
+    position:absolute;
 
-        /* =========================================
-           CUBE
-        ========================================= */
+    left:50%;
 
-        .cube {
+    bottom:
+        calc(
+            12px +
+            env(
+                safe-area-inset-bottom,
+                0px
+            )
+        );
 
-            position: relative;
+    transform:
+        translateX(-50%);
 
-            width: 34px;
-            height: 34px;
+    z-index:30;
 
-            transform-style: preserve-3d;
+    display:flex;
 
-            transform:
-                rotateX(-25deg)
-                rotateY(35deg);
+    align-items:center;
 
-            transition:
-                transform .35s ease;
+    justify-content:center;
 
-        }
+    gap:7px;
 
-        .cube-face {
+    padding:8px;
 
-            position: absolute;
+    border-radius:21px;
 
-            width: 34px;
-            height: 34px;
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .82
+        );
 
-            border: 2px solid #111;
+    backdrop-filter:
+        blur(12px);
 
-            background: #d9a441;
+    -webkit-backdrop-filter:
+        blur(12px);
+}
 
-            opacity: .95;
 
-        }
+/* =====================================================
+   BUTTONS
+===================================================== */
 
-        .cube-front {
-            transform:
-                translateZ(17px);
-        }
+.button{
 
-        .cube-back {
-            transform:
-                rotateY(180deg)
-                translateZ(17px);
-        }
+    width:46px;
+    height:46px;
 
-        .cube-right {
-            transform:
-                rotateY(90deg)
-                translateZ(17px);
-            background: #b78327;
-        }
+    border:0;
 
-        .cube-left {
-            transform:
-                rotateY(-90deg)
-                translateZ(17px);
-            background: #e5bd67;
-        }
+    border-radius:13px;
 
-        .cube-top {
-            transform:
-                rotateX(90deg)
-                translateZ(17px);
-            background: #f0cf83;
-        }
+    display:flex;
 
-        .cube-bottom {
-            transform:
-                rotateX(-90deg)
-                translateZ(17px);
-            background: #8d651e;
-        }
+    align-items:center;
+    justify-content:center;
 
+    background:#303030;
 
-        /* =========================================
-           CAMERA BUTTON
-        ========================================= */
+    color:white;
 
-        .camera-button {
+    font-size:20px;
 
-            position: absolute;
+    font-weight:bold;
 
-            right: 15px;
+    cursor:pointer;
 
-            bottom:
-                calc(
-                    18px +
-                    env(safe-area-inset-bottom, 0px)
-                );
+    user-select:none;
 
-            z-index: 30;
+    -webkit-user-select:none;
 
-            width: 62px;
-            height: 62px;
+    touch-action:manipulation;
+}
 
-            border: none;
+.button:active{
 
-            border-radius: 17px;
+    transform:scale(.91);
+}
 
-            background: white;
+.button.photo{
 
-            color: #111;
+    background:white;
 
-            display: flex;
+    color:#111;
 
-            align-items: center;
-            justify-content: center;
+}
 
-            font-size: 27px;
+.button.auto{
 
-            cursor: pointer;
+    background:#303030;
+}
 
-            box-shadow:
-                0 5px 20px rgba(0,0,0,.4);
+.button.auto.active{
 
-            touch-action: manipulation;
+    background:#d9a441;
 
-        }
+    color:#111;
+}
 
-        .camera-button:active {
 
-            transform: scale(.90);
+/* =====================================================
+   AR OVERLAY
+===================================================== */
 
-        }
+#arInterface{
 
+    display:none;
 
-        /* =========================================
-           CAMERA FLASH
-        ========================================= */
+    position:fixed;
 
-        .flash {
+    inset:0;
 
-            position: absolute;
+    z-index:1000;
 
-            inset: 0;
+    pointer-events:none;
+}
 
-            z-index: 100;
+body.in-ar #arInterface{
 
-            background: white;
+    display:block;
+}
 
-            opacity: 0;
 
-            pointer-events: none;
+/* =====================================================
+   AR TITLE
+===================================================== */
 
-        }
+.ar-title{
 
-        .flash.active {
+    position:absolute;
 
-            animation: cameraFlash .25s ease;
+    top:
+        calc(
+            14px +
+            env(
+                safe-area-inset-top,
+                0px
+            )
+        );
 
-        }
+    left:50%;
 
-        @keyframes cameraFlash {
+    transform:
+        translateX(-50%);
 
-            0% {
-                opacity: 0;
-            }
+    padding:
+        8px
+        14px;
 
-            35% {
-                opacity: .85;
-            }
+    border-radius:18px;
 
-            100% {
-                opacity: 0;
-            }
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .68
+        );
 
-        }
+    backdrop-filter:
+        blur(10px);
 
+    -webkit-backdrop-filter:
+        blur(10px);
 
-        /* =========================================
-           STATUS MESSAGE
-        ========================================= */
+    font-size:11px;
 
-        .status {
+    white-space:nowrap;
+}
 
-            position: absolute;
 
-            left: 50%;
-            top: 50%;
+/* =====================================================
+   AR BOTTOM CONTROLS
+===================================================== */
 
-            transform:
-                translate(-50%, -50%);
+.ar-controls{
 
-            z-index: 80;
+    position:absolute;
 
-            display: none;
+    left:0;
+    right:0;
 
-            max-width: 85%;
+    bottom:
+        calc(
+            18px +
+            env(
+                safe-area-inset-bottom,
+                0px
+            )
+        );
 
-            padding: 13px 17px;
+    display:flex;
 
-            border-radius: 15px;
+    justify-content:space-between;
 
-            background:
-                rgba(0,0,0,.88);
+    align-items:center;
 
-            color: white;
+    padding:
+        0
+        16px;
+}
 
-            font-size: 13px;
 
-            line-height: 1.4;
+/* =====================================================
+   ROTATION CUBE
+===================================================== */
 
-            text-align: center;
+.cube-button{
 
-        }
+    width:62px;
+    height:62px;
 
-        .status.show {
+    padding:0;
 
-            display: block;
+    border:0;
 
-        }
+    border-radius:17px;
 
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .82
+        );
 
-        /* =========================================
-           SMALL INSTRUCTION
-        ========================================= */
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.45);
 
-        .help {
+    display:flex;
 
-            position: absolute;
+    align-items:center;
+    justify-content:center;
 
-            left: 50%;
+    pointer-events:auto;
 
-            bottom: 95px;
+    touch-action:none;
+}
 
-            transform:
-                translateX(-50%);
+.cube-scene{
 
-            z-index: 15;
+    width:38px;
+    height:38px;
 
-            color:
-                rgba(255,255,255,.72);
+    perspective:160px;
+}
 
-            font-size: 11px;
+.cube{
 
-            white-space: nowrap;
+    width:34px;
+    height:34px;
 
-            pointer-events: none;
+    position:relative;
 
-        }
+    transform-style:preserve-3d;
 
+    transform:
+        rotateX(-25deg)
+        rotateY(35deg);
 
-        /* =========================================
-           MOBILE
-        ========================================= */
+}
 
-        @media (max-width: 500px) {
+.face{
 
-            header h1 {
-                font-size: 20px;
-            }
+    position:absolute;
 
-            header p {
-                font-size: 11px;
-            }
+    width:34px;
+    height:34px;
 
-            .cube-control,
-            .camera-button {
+    border:
+        2px solid
+        #111;
 
-                width: 56px;
-                height: 56px;
+    background:#d9a441;
+}
 
-                border-radius: 15px;
+.front{
+    transform:
+        translateZ(17px);
+}
 
-            }
+.back{
+    transform:
+        rotateY(180deg)
+        translateZ(17px);
+}
 
-            .cube {
-                width: 30px;
-                height: 30px;
-            }
+.right{
+    transform:
+        rotateY(90deg)
+        translateZ(17px);
 
-            .cube-face {
-                width: 30px;
-                height: 30px;
-            }
+    background:#b78327;
+}
 
-            .cube-front,
-            .cube-back {
-                transform:
-                    translateZ(15px);
-            }
+.left{
+    transform:
+        rotateY(-90deg)
+        translateZ(17px);
 
-            .cube-right {
-                transform:
-                    rotateY(90deg)
-                    translateZ(15px);
-            }
+    background:#e7c36f;
+}
 
-            .cube-left {
-                transform:
-                    rotateY(-90deg)
-                    translateZ(15px);
-            }
+.top{
+    transform:
+        rotateX(90deg)
+        translateZ(17px);
 
-            .cube-top {
-                transform:
-                    rotateX(90deg)
-                    translateZ(15px);
-            }
+    background:#f1d58f;
+}
 
-            .cube-bottom {
-                transform:
-                    rotateX(-90deg)
-                    translateZ(15px);
-            }
+.bottom{
+    transform:
+        rotateX(-90deg)
+        translateZ(17px);
 
-            .ar-button {
+    background:#8d651f;
+}
 
-                bottom: 115px;
 
-                padding:
-                    13px 20px;
+/* =====================================================
+   CAMERA BUTTON
+===================================================== */
 
-            }
+.camera-button{
 
-            .help {
-                bottom: 88px;
-            }
+    width:62px;
+    height:62px;
 
-        }
+    border:0;
 
-    </style>
+    border-radius:50%;
+
+    background:white;
+
+    color:#111;
+
+    font-size:27px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:auto;
+
+    touch-action:manipulation;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,.45);
+
+    cursor:pointer;
+}
+
+.camera-button:active{
+
+    transform:scale(.9);
+}
+
+
+/* =====================================================
+   FLASH
+===================================================== */
+
+#flash{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:2000;
+
+    background:white;
+
+    opacity:0;
+
+    pointer-events:none;
+}
+
+#flash.active{
+
+    animation:
+        cameraFlash
+        .25s
+        ease;
+}
+
+@keyframes cameraFlash{
+
+    0%{
+        opacity:0;
+    }
+
+    35%{
+        opacity:.9;
+    }
+
+    100%{
+        opacity:0;
+    }
+}
+
+
+/* =====================================================
+   STATUS MESSAGE
+===================================================== */
+
+#status{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    z-index:3000;
+
+    display:none;
+
+    width:max-content;
+
+    max-width:85%;
+
+    padding:
+        13px
+        17px;
+
+    border-radius:15px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .9
+        );
+
+    color:white;
+
+    font-size:13px;
+
+    line-height:1.4;
+
+    text-align:center;
+}
+
+#status.show{
+
+    display:block;
+}
+
+
+/* =====================================================
+   SMALL SCREENS
+===================================================== */
+
+@media(max-width:390px){
+
+    .button{
+
+        width:42px;
+        height:42px;
+
+        font-size:18px;
+    }
+
+    .bottom-bar{
+
+        gap:5px;
+        padding:7px;
+    }
+
+    .cube-button,
+    .camera-button{
+
+        width:56px;
+        height:56px;
+    }
+
+    .ar-button{
+
+        padding:
+            13px
+            19px;
+    }
+}
+
+</style>
 
 </head>
 
@@ -562,159 +754,260 @@
 <div class="app">
 
 
-    <!-- HEADER -->
+<!-- ===================================================
+     HEADER
+=================================================== -->
 
-    <header>
+<header>
 
-        <h1>Mayan Sculpture</h1>
+<h1>Mayan Sculpture</h1>
 
-        <p>
-            Explore the sculpture in augmented reality
-        </p>
+<p>
+Explore the sculpture in augmented reality
+</p>
 
-    </header>
+</header>
 
 
-    <!-- VIEWER -->
+<!-- ===================================================
+     3D VIEWER
+=================================================== -->
 
-    <div class="viewer">
+<div class="viewer">
 
 
-        <model-viewer
+<model-viewer
 
-            id="model"
+id="model"
 
-            src="./escultura.glb"
+src="./escultura.glb"
 
-            alt="Mayan sculpture"
+alt="Mayan sculpture"
 
-            ar
+ar
 
-            ar-modes="webxr scene-viewer quick-look"
+ar-modes="
+webxr
+scene-viewer
+quick-look
+"
 
-            camera-controls
+ar-placement="floor"
 
-            touch-action="none"
+ar-scale="auto"
 
-            shadow-intensity="1"
+camera-controls
 
-            shadow-softness="0.7"
+touch-action="none"
 
-            exposure="1"
+shadow-intensity="1"
 
-            environment-image="neutral"
+shadow-softness="0.7"
 
-            interaction-prompt="auto"
+exposure="1"
 
-            camera-orbit="0deg 75deg 3m"
+environment-image="neutral"
 
-            min-camera-orbit="auto 10deg 0.6m"
+interaction-prompt="auto"
 
-            max-camera-orbit="auto 170deg 10m"
+camera-orbit="
+0deg
+75deg
+3m
+"
 
-            field-of-view="30deg"
+min-camera-orbit="
+auto
+10deg
+0.6m
+"
 
-            loading="eager">
+max-camera-orbit="
+auto
+170deg
+10m
+"
 
+field-of-view="30deg"
 
-            <!-- AR BUTTON -->
+loading="eager">
 
-            <button
 
-                slot="ar-button"
+<!-- AR BUTTON -->
 
-                class="ar-button"
+<button
 
-                id="enterAR">
+slot="ar-button"
 
-                📱 VIEW IN MY SPACE
+id="enterAR"
 
-            </button>
+class="ar-button">
 
+📱 VIEW IN MY SPACE
 
-        </model-viewer>
+</button>
 
 
-        <!-- =====================================
-             ROTATION CUBE
-        ====================================== -->
+</model-viewer>
 
-        <button
 
-            id="cubeButton"
+<!-- ===================================================
+     NORMAL VIEW CONTROLS
+=================================================== -->
 
-            class="cube-control"
+<div class="bottom-bar">
 
-            aria-label="Rotate sculpture"
 
-            title="Rotate sculpture">
+<button
+class="button"
+id="reset"
+aria-label="Reset">
 
+🎯
 
-            <div class="cube">
+</button>
 
-                <div class="cube-face cube-front"></div>
 
-                <div class="cube-face cube-back"></div>
+<button
+class="button"
+id="rotateLeft"
+aria-label="Rotate left">
 
-                <div class="cube-face cube-right"></div>
+↶
 
-                <div class="cube-face cube-left"></div>
+</button>
 
-                <div class="cube-face cube-top"></div>
 
-                <div class="cube-face cube-bottom"></div>
+<button
+class="button"
+id="rotateRight"
+aria-label="Rotate right">
 
-            </div>
+↷
 
+</button>
 
-        </button>
 
+<button
+class="button"
+id="zoomOut"
+aria-label="Zoom out">
 
-        <!-- =====================================
-             CAMERA
-        ====================================== -->
+−
 
-        <button
+</button>
 
-            id="cameraButton"
 
-            class="camera-button"
+<button
+class="button"
+id="zoomIn"
+aria-label="Zoom in">
 
-            aria-label="Take photo"
++
 
-            title="Take photo">
+</button>
 
-            📷
 
-        </button>
+<button
+class="button auto"
+id="autoRotate"
+aria-label="Auto rotate">
 
+▶
 
-        <!-- CAMERA FLASH -->
+</button>
 
-        <div
-            id="flash"
-            class="flash">
-        </div>
 
+</div>
 
-        <!-- STATUS -->
 
-        <div
-            id="status"
-            class="status">
-        </div>
+<div class="help">
 
+Drag to rotate · Pinch to zoom
 
-        <!-- HELP -->
+</div>
 
-        <div class="help">
 
-            Drag to rotate · Pinch to zoom
+</div>
 
-        </div>
 
+<!-- ===================================================
+     AR INTERFACE
+=================================================== -->
 
-    </div>
+<div id="arInterface">
+
+
+<div class="ar-title">
+
+Mayan Sculpture · AR
+
+</div>
+
+
+<div class="ar-controls">
+
+
+<!-- ROTATION CUBE -->
+
+<button
+id="cubeButton"
+class="cube-button"
+aria-label="Rotate sculpture">
+
+
+<div class="cube-scene">
+
+
+<div
+id="cube"
+class="cube">
+
+<div class="face front"></div>
+
+<div class="face back"></div>
+
+<div class="face right"></div>
+
+<div class="face left"></div>
+
+<div class="face top"></div>
+
+<div class="face bottom"></div>
+
+</div>
+
+</div>
+
+</button>
+
+
+<!-- CAMERA -->
+
+<button
+id="cameraButton"
+class="camera-button"
+aria-label="Take photo">
+
+📷
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+<!-- FLASH -->
+
+<div id="flash"></div>
+
+
+<!-- STATUS -->
+
+<div id="status"></div>
 
 
 </div>
@@ -722,393 +1015,682 @@
 
 <script>
 
-    /* =========================================
-       ELEMENTS
-    ========================================= */
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-    const model =
-        document.getElementById("model");
+const model =
+document.getElementById(
+    "model"
+);
 
-    const cubeButton =
-        document.getElementById("cubeButton");
+const resetButton =
+document.getElementById(
+    "reset"
+);
 
-    const cameraButton =
-        document.getElementById("cameraButton");
+const rotateLeftButton =
+document.getElementById(
+    "rotateLeft"
+);
 
-    const flash =
-        document.getElementById("flash");
+const rotateRightButton =
+document.getElementById(
+    "rotateRight"
+);
 
-    const status =
-        document.getElementById("status");
+const zoomInButton =
+document.getElementById(
+    "zoomIn"
+);
+
+const zoomOutButton =
+document.getElementById(
+    "zoomOut"
+);
+
+const autoButton =
+document.getElementById(
+    "autoRotate"
+);
+
+const cubeButton =
+document.getElementById(
+    "cubeButton"
+);
+
+const cube =
+document.getElementById(
+    "cube"
+);
+
+const cameraButton =
+document.getElementById(
+    "cameraButton"
+);
+
+const flash =
+document.getElementById(
+    "flash"
+);
+
+const status =
+document.getElementById(
+    "status"
+);
 
 
-    /* =========================================
-       DEFAULT CAMERA
-    ========================================= */
+/* =====================================================
+   STATUS
+===================================================== */
 
-    const DEFAULT_ORBIT =
-        "0deg 75deg 3m";
+let statusTimer = null;
 
+function showStatus(
+    message,
+    duration = 2500
+){
 
-    /* =========================================
-       STATUS
-    ========================================= */
+    status.textContent =
+        message;
 
-    function showStatus(
-        message,
-        duration = 2500
-    ) {
+    status.classList.add(
+        "show"
+    );
 
-        status.textContent =
-            message;
+    clearTimeout(
+        statusTimer
+    );
 
-        status.classList.add(
-            "show"
-        );
-
-        clearTimeout(
-            showStatus.timer
-        );
-
-        showStatus.timer =
-            setTimeout(() => {
+    statusTimer =
+        setTimeout(
+            () => {
 
                 status.classList.remove(
                     "show"
                 );
 
-            }, duration);
+            },
+            duration
+        );
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+const DEFAULT_ORBIT =
+    "0deg 75deg 3m";
+
+
+function resetView(){
+
+    model.cameraOrbit =
+        DEFAULT_ORBIT;
+
+    model.fieldOfView =
+        "30deg";
+}
+
+
+resetButton.addEventListener(
+    "click",
+    resetView
+);
+
+
+/* =====================================================
+   ROTATION
+===================================================== */
+
+function rotateModel(
+    degrees
+){
+
+    const orbit =
+        model.getCameraOrbit();
+
+    const theta =
+        orbit.theta +
+        degrees *
+        Math.PI /
+        180;
+
+    model.cameraOrbit =
+        `${theta}rad ` +
+        `${orbit.phi}rad ` +
+        `${orbit.radius}m`;
+}
+
+
+rotateLeftButton.addEventListener(
+    "click",
+    () => {
+
+        rotateModel(-30);
 
     }
+);
 
 
-    /* =========================================
-       ROTATE SCULPTURE
-    ========================================= */
+rotateRightButton.addEventListener(
+    "click",
+    () => {
 
-    function rotateSculpture(
-        horizontal,
-        vertical
-    ) {
+        rotateModel(30);
 
-        const orbit =
-            model.getCameraOrbit();
+    }
+);
 
-        if (!orbit) {
+
+/* =====================================================
+   ZOOM
+===================================================== */
+
+function changeZoom(
+    multiplier
+){
+
+    const orbit =
+        model.getCameraOrbit();
+
+    let radius =
+        orbit.radius *
+        multiplier;
+
+    radius =
+        Math.max(
+            .6,
+            Math.min(
+                10,
+                radius
+            )
+        );
+
+    model.cameraOrbit =
+        `${orbit.theta}rad ` +
+        `${orbit.phi}rad ` +
+        `${radius}m`;
+}
+
+
+zoomInButton.addEventListener(
+    "click",
+    () => {
+
+        changeZoom(.82);
+
+    }
+);
+
+
+zoomOutButton.addEventListener(
+    "click",
+    () => {
+
+        changeZoom(1.22);
+
+    }
+);
+
+
+/* =====================================================
+   AUTO ROTATION
+===================================================== */
+
+let autoActive =
+    false;
+
+
+autoButton.addEventListener(
+    "click",
+    () => {
+
+        autoActive =
+            !autoActive;
+
+
+        if(autoActive){
+
+            model.setAttribute(
+                "auto-rotate",
+                ""
+            );
+
+            model.setAttribute(
+                "rotation-per-second",
+                "20deg"
+            );
+
+            autoButton.textContent =
+                "⏸";
+
+            autoButton.classList.add(
+                "active"
+            );
+
+        }else{
+
+            model.removeAttribute(
+                "auto-rotate"
+            );
+
+            autoButton.textContent =
+                "▶";
+
+            autoButton.classList.remove(
+                "active"
+            );
+        }
+
+    }
+);
+
+
+/* =====================================================
+   AR STATUS
+===================================================== */
+
+model.addEventListener(
+    "ar-status",
+    event => {
+
+        console.log(
+            "AR status:",
+            event.detail
+        );
+
+
+        if(
+            event.detail.status ===
+            "session-started"
+        ){
+
+            document.body.classList.add(
+                "in-ar"
+            );
+
+        }
+
+
+        if(
+            event.detail.status ===
+            "not-presenting"
+        ){
+
+            document.body.classList.remove(
+                "in-ar"
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   MODEL LOAD
+===================================================== */
+
+model.addEventListener(
+    "load",
+    () => {
+
+        resetView();
+
+    }
+);
+
+
+/* =====================================================
+   MODEL ERROR
+===================================================== */
+
+model.addEventListener(
+    "error",
+    () => {
+
+        showStatus(
+            "Could not load escultura.glb",
+            5000
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CUBE → ROTATE MODEL
+===================================================== */
+
+let dragging =
+    false;
+
+let lastX = 0;
+let lastY = 0;
+
+let cubeRotationX =
+    -25;
+
+let cubeRotationY =
+    35;
+
+
+cubeButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        dragging =
+            true;
+
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
+
+        cubeButton.setPointerCapture?.(
+            event.pointerId
+        );
+
+    }
+);
+
+
+cubeButton.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!dragging){
             return;
         }
 
 
-        let theta =
-            orbit.theta +
-            horizontal;
+        const dx =
+            event.clientX -
+            lastX;
+
+        const dy =
+            event.clientY -
+            lastY;
 
 
-        let phi =
-            orbit.phi +
-            vertical;
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
 
 
         /*
-         * Keep vertical rotation
-         * inside a safe range.
+         * Rotate the sculpture.
          */
 
-        const minPhi =
-            10 * Math.PI / 180;
+        const orbit =
+            model.getCameraOrbit();
 
-        const maxPhi =
-            170 * Math.PI / 180;
+        if(orbit){
+
+            const newTheta =
+                orbit.theta +
+                dx *
+                0.012;
+
+            const newPhi =
+                Math.max(
+                    0.15,
+                    Math.min(
+                        2.95,
+                        orbit.phi +
+                        dy *
+                        0.012
+                    )
+                );
+
+            model.cameraOrbit =
+                `${newTheta}rad ` +
+                `${newPhi}rad ` +
+                `${orbit.radius}m`;
+
+        }
 
 
-        phi =
+        /*
+         * Rotate the visual cube.
+         */
+
+        cubeRotationY +=
+            dx * .7;
+
+        cubeRotationX -=
+            dy * .7;
+
+
+        cubeRotationX =
             Math.max(
-                minPhi,
+                -80,
                 Math.min(
-                    maxPhi,
-                    phi
+                    80,
+                    cubeRotationX
                 )
             );
 
 
+        cube.style.transform =
+            `rotateX(${cubeRotationX}deg)
+             rotateY(${cubeRotationY}deg)`;
+
+    }
+);
+
+
+function stopCubeDrag(){
+
+    dragging =
+        false;
+}
+
+
+cubeButton.addEventListener(
+    "pointerup",
+    stopCubeDrag
+);
+
+cubeButton.addEventListener(
+    "pointercancel",
+    stopCubeDrag
+);
+
+
+/* =====================================================
+   PHOTO
+===================================================== */
+
+async function takePhoto(){
+
+    /*
+     * Flash effect.
+     */
+
+    flash.classList.remove(
+        "active"
+    );
+
+    void flash.offsetWidth;
+
+    flash.classList.add(
+        "active"
+    );
+
+
+    /*
+     * Try model-viewer capture.
+     *
+     * This captures the rendered
+     * model. Complete camera +
+     * environment capture requires
+     * browser WebXR capture support.
+     */
+
+    try{
+
+        if(
+            typeof model.toBlob !==
+            "function"
+        ){
+
+            throw new Error(
+                "toBlob unavailable"
+            );
+        }
+
+
+        const blob =
+            await model.toBlob({
+
+                idealAspect:1,
+
+                mimeType:
+                    "image/png"
+
+            });
+
+
+        if(!blob){
+
+            throw new Error(
+                "Empty image"
+            );
+        }
+
+
+        downloadPhoto(
+            blob
+        );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+        showStatus(
+            "Photo capture is not available on this browser.",
+            4000
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DOWNLOAD PHOTO
+===================================================== */
+
+function downloadPhoto(
+    blob
+){
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        `mayan-sculpture-${Date.now()}.png`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    setTimeout(
+        () => {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        3000
+    );
+
+
+    showStatus(
+        "Photo saved."
+    );
+
+}
+
+
+cameraButton.addEventListener(
+    "click",
+    takePhoto
+);
+
+
+/* =====================================================
+   PAGE VISIBILITY
+===================================================== */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if(
+            document.hidden &&
+            autoActive
+        ){
+
+            model.removeAttribute(
+                "auto-rotate"
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+model.addEventListener(
+    "load",
+    () => {
+
         model.cameraOrbit =
-            `${theta}rad ` +
-            `${phi}rad ` +
-            `${orbit.radius}m`;
+            DEFAULT_ORBIT;
+
+        model.fieldOfView =
+            "30deg";
 
     }
-
-
-    /* =========================================
-       CUBE BUTTON
-       
-       Each tap rotates the sculpture
-       around its vertical axis.
-    ========================================= */
-
-    let cubeRotation = 35;
-
-
-    cubeButton.addEventListener(
-        "click",
-        () => {
-
-            const step =
-                45 *
-                Math.PI /
-                180;
-
-
-            rotateSculpture(
-                step,
-                0
-            );
-
-
-            cubeRotation += 45;
-
-
-            cubeButton
-                .querySelector(".cube")
-                .style.transform =
-                    `rotateX(-25deg)
-                     rotateY(${cubeRotation}deg)`;
-
-        }
-    );
-
-
-    /* =========================================
-       CAMERA / PHOTO
-    ========================================= */
-
-    async function takePhoto() {
-
-        try {
-
-            /*
-             * model-viewer creates an image
-             * of the 3D viewer.
-             */
-
-            if (
-                typeof model.toBlob !==
-                "function"
-            ) {
-
-                throw new Error(
-                    "Photo capture unavailable"
-                );
-
-            }
-
-
-            const blob =
-                await model.toBlob({
-
-                    idealAspect: 1,
-
-                    mimeType:
-                        "image/png"
-
-                });
-
-
-            if (!blob) {
-
-                throw new Error(
-                    "Image creation failed"
-                );
-
-            }
-
-
-            /*
-             * Flash effect
-             */
-
-            flash.classList.remove(
-                "active"
-            );
-
-            void flash.offsetWidth;
-
-            flash.classList.add(
-                "active"
-            );
-
-
-            /*
-             * Download image
-             */
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            const link =
-                document.createElement(
-                    "a"
-                );
-
-
-            link.href = url;
-
-            link.download =
-                `mayan-sculpture-${Date.now()}.png`;
-
-
-            document.body.appendChild(
-                link
-            );
-
-            link.click();
-
-            link.remove();
-
-
-            setTimeout(
-                () => {
-
-                    URL.revokeObjectURL(
-                        url
-                    );
-
-                },
-                2000
-            );
-
-
-            showStatus(
-                "Photo saved"
-            );
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            showStatus(
-                "Photo capture is not available in this browser.",
-                4000
-            );
-
-        }
-
-    }
-
-
-    cameraButton.addEventListener(
-        "click",
-        takePhoto
-    );
-
-
-    /* =========================================
-       RESET WITH DOUBLE TAP ON CUBE
-    ========================================= */
-
-    let lastCubeTap = 0;
-
-
-    cubeButton.addEventListener(
-        "click",
-        () => {
-
-            const now =
-                Date.now();
-
-
-            if (
-                now - lastCubeTap <
-                500
-            ) {
-
-                model.cameraOrbit =
-                    DEFAULT_ORBIT;
-
-                model.fieldOfView =
-                    "30deg";
-
-
-                cubeRotation = 35;
-
-
-                cubeButton
-                    .querySelector(".cube")
-                    .style.transform =
-                        "rotateX(-25deg) rotateY(35deg)";
-
-
-                showStatus(
-                    "View centered"
-                );
-
-            }
-
-
-            lastCubeTap = now;
-
-        }
-    );
-
-
-    /* =========================================
-       MODEL LOADED
-    ========================================= */
-
-    model.addEventListener(
-        "load",
-        () => {
-
-            model.cameraOrbit =
-                DEFAULT_ORBIT;
-
-        }
-    );
-
-
-    /* =========================================
-       MODEL ERROR
-    ========================================= */
-
-    model.addEventListener(
-        "error",
-        () => {
-
-            showStatus(
-                "Unable to load escultura.glb",
-                5000
-            );
-
-            console.error(
-                "Unable to load escultura.glb"
-            );
-
-        }
-    );
-
-
-    /* =========================================
-       AR STATUS
-    ========================================= */
-
-    model.addEventListener(
-        "ar-status",
-        event => {
-
-            console.log(
-                "AR status:",
-                event.detail
-            );
-
-        }
-    );
+);
 
 </script>
-
 
 </body>
 
