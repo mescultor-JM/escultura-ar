@@ -1,86 +1,206 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html> <html lang="es"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escultura Maya AR</title>
 
-<head>
+<script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+</script>
 
-    <meta charset="UTF-8">
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    body {
+        margin: 0;
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
 
-    <title>Escultura Maya AR</title>
+    header {
+        padding: 18px 15px 10px;
+    }
 
-    <script type="module"
-        src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
-    </script>
+    h1 {
+        margin: 0;
+        font-size: 25px;
+    }
 
-    <style>
+    header p {
+        margin: 6px 0 0;
+        color: #aaa;
+        font-size: 14px;
+    }
 
-        body {
-            margin: 0;
-            background: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
+    .visor {
+        position: relative;
+        width: 100%;
+        height: 65vh;
+        min-height: 400px;
+    }
+
+    model-viewer {
+        width: 100%;
+        height: 100%;
+        background: #222;
+        --poster-color: #222;
+    }
+
+    /* PANEL DE CONTROLES */
+
+    .controles {
+        position: absolute;
+        left: 50%;
+        bottom: 15px;
+        transform: translateX(-50%);
+
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 10px 12px;
+
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(8px);
+
+        border-radius: 16px;
+
+        z-index: 10;
+    }
+
+    .control {
+        width: 48px;
+        height: 48px;
+
+        border: none;
+        border-radius: 12px;
+
+        background: #fff;
+        color: #111;
+
+        font-size: 21px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        touch-action: manipulation;
+    }
+
+    .control:active {
+        transform: scale(0.94);
+    }
+
+    .control-largo {
+        width: auto;
+        padding: 0 15px;
+        font-size: 14px;
+    }
+
+    /* PANEL INFERIOR */
+
+    .panel {
+        padding: 15px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .fila {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .boton {
+        border: none;
+        border-radius: 12px;
+
+        padding: 13px 18px;
+
+        background: #fff;
+        color: #111;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .boton.secundario {
+        background: #333;
+        color: white;
+    }
+
+    .boton.ar {
+        background: #d9a441;
+        color: #111;
+    }
+
+    /* INFORMACIÓN */
+
+    .info {
+        margin-top: 10px;
+        color: #999;
+        font-size: 13px;
+    }
+
+    /* MÓVIL */
+
+    @media (max-width: 500px) {
+
+        .visor {
+            height: 62vh;
+            min-height: 350px;
         }
 
-        h1 {
-            margin: 20px 0 5px;
+        .controles {
+            gap: 7px;
+            padding: 8px;
         }
 
-        p {
-            color: #ccc;
+        .control {
+            width: 43px;
+            height: 43px;
         }
 
-        model-viewer {
-            width: 100%;
-            height: 70vh;
-            background: #222;
+        .control-largo {
+            padding: 0 10px;
         }
+    }
+</style>
 
-        .boton {
-            margin: 15px;
-            padding: 16px 25px;
-            border: none;
-            border-radius: 10px;
-            background: #ffffff;
-            color: #111;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
+</head> <body>
+<header>
     <h1>Escultura Maya</h1>
-
     <p>Explora la escultura en 3D</p>
+</header>
+
+<div class="visor">
 
     <model-viewer
+        id="modelo"
 
         src="./escultura.glb"
 
         alt="Escultura Maya"
 
         ar
-
         ar-modes="webxr scene-viewer quick-look"
 
         camera-controls
 
-        auto-rotate
-
         shadow-intensity="1"
+        exposure="1"
 
-        exposure="1">
+        min-camera-orbit="auto auto 1m"
+        max-camera-orbit="auto auto 10m">
 
+        <!-- Botón AR -->
         <button
             slot="ar-button"
-            class="boton">
+            class="boton ar">
 
             📱 VER EN MI ESPACIO
 
@@ -88,6 +208,217 @@
 
     </model-viewer>
 
-</body>
 
-</html>
+    <!-- CONTROLES DIRECTOS -->
+
+    <div class="controles">
+
+        <button
+            class="control"
+            id="izquierda"
+            title="Rotar izquierda">
+
+            ↶
+
+        </button>
+
+        <button
+            class="control"
+            id="derecha"
+            title="Rotar derecha">
+
+            ↷
+
+        </button>
+
+        <button
+            class="control"
+            id="zoomMenos"
+            title="Alejar">
+
+            −
+
+        </button>
+
+        <button
+            class="control"
+            id="zoomMas"
+            title="Acercar">
+
+            +
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- BOTONES PRINCIPALES -->
+
+<div class="panel">
+
+    <div class="fila">
+
+        <button
+            class="boton secundario"
+            id="reset">
+
+            ⟳ Centrar
+
+        </button>
+
+        <button
+            class="boton secundario"
+            id="auto">
+
+            ▶ Auto
+
+        </button>
+
+    </div>
+
+    <div class="info">
+        Usa los dedos para rotar y hacer zoom.
+    </div>
+
+</div>
+
+
+<script>
+
+    const modelo = document.getElementById("modelo");
+
+    const izquierda = document.getElementById("izquierda");
+    const derecha = document.getElementById("derecha");
+
+    const zoomMenos = document.getElementById("zoomMenos");
+    const zoomMas = document.getElementById("zoomMas");
+
+    const reset = document.getElementById("reset");
+    const auto = document.getElementById("auto");
+
+
+    /* =========================
+       ROTACIÓN
+    ========================= */
+
+    function rotar(grados) {
+
+        const orbita = modelo.getCameraOrbit();
+
+        const nuevoTheta =
+            orbita.theta + (grados * Math.PI / 180);
+
+        modelo.cameraOrbit =
+            `${nuevoTheta}rad ${orbita.phi}rad ${orbita.radius}m`;
+    }
+
+
+    izquierda.addEventListener("click", () => {
+
+        rotar(-30);
+
+    });
+
+
+    derecha.addEventListener("click", () => {
+
+        rotar(30);
+
+    });
+
+
+    /* =========================
+       ZOOM
+    ========================= */
+
+    function zoom(factor) {
+
+        const orbita = modelo.getCameraOrbit();
+
+        let nuevoRadio =
+            orbita.radius * factor;
+
+        nuevoRadio =
+            Math.max(1, Math.min(10, nuevoRadio));
+
+        modelo.cameraOrbit =
+            `${orbita.theta}rad ${orbita.phi}rad ${nuevoRadio}m`;
+    }
+
+
+    zoomMas.addEventListener("click", () => {
+
+        zoom(0.8);
+
+    });
+
+
+    zoomMenos.addEventListener("click", () => {
+
+        zoom(1.25);
+
+    });
+
+
+    /* =========================
+       CENTRAR
+    ========================= */
+
+    reset.addEventListener("click", () => {
+
+        modelo.cameraOrbit = "0deg 75deg 3m";
+
+        modelo.fieldOfView = "30deg";
+
+    });
+
+
+    /* =========================
+       AUTO ROTACIÓN
+    ========================= */
+
+    let autoActivo = false;
+
+
+    auto.addEventListener("click", () => {
+
+        autoActivo = !autoActivo;
+
+        if (autoActivo) {
+
+            modelo.setAttribute(
+                "auto-rotate",
+                ""
+            );
+
+            auto.textContent =
+                "⏸ Parar";
+
+        } else {
+
+            modelo.removeAttribute(
+                "auto-rotate"
+            );
+
+            auto.textContent =
+                "▶ Auto";
+
+        }
+
+    });
+
+
+    /* =========================
+       VELOCIDAD DE AUTO ROTACIÓN
+    ========================= */
+
+    modelo.setAttribute(
+        "rotation-per-second",
+        "20deg"
+    );
+
+</script>
+
+</body> </html>
