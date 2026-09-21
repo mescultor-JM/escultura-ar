@@ -1,101 +1,752 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"> <title>Mayan Sculpture AR</title> <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script> <style> *{box-sizing:border-box;-webkit-tap-highlight-color:transparent} html,body{ margin:0; width:100%; height:100%; overflow:hidden; background:#111; font-family:Arial,sans-serif; } body{touch-action:manipulation} #app{ position:relative; width:100%; height:100dvh; overflow:hidden; } model-viewer{ position:absolute; inset:0; width:100%; height:100%; background:#181818; --poster-color:#181818; touch-action:none; } /* HEADER */ header{ position:absolute; top:env(safe-area-inset-top,0); left:0; width:100%; z-index:10; padding:16px; text-align:center; pointer-events:none; color:white; background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent); } header h1{ margin:0; font-size:21px; } header p{ margin:5px 0 0; color:#ccc; font-size:12px; } /* VIEW IN MY SPACE */ #arButton{ position:absolute; left:50%; bottom:120px; transform:translateX(-50%); z-index:20; border:0; border-radius:18px; padding:15px 24px; background:#d9a441; color:#111; font-size:15px; font-weight:800; box-shadow:0 6px 25px rgba(0,0,0,.45); } /* NORMAL CONTROLS */ #controls{ position:absolute; left:50%; bottom:calc(15px + env(safe-area-inset-bottom,0)); transform:translateX(-50%); z-index:20; display:flex; gap:7px; padding:8px; border-radius:20px; background:rgba(0,0,0,.82); backdrop-filter:blur(10px); } .control{ width:45px; height:45px; border:0; border-radius:13px; background:#303030; color:white; font-size:20px; font-weight:bold; } /* AR INTERFACE */ #arUI{ display:none; position:fixed; inset:0; z-index:100; pointer-events:none; } #arUI.active{ display:block; } /* AR TITLE */ #arTitle{ position:absolute; top:calc(14px + env(safe-area-inset-top,0)); left:50%; transform:translateX(-50%); padding:8px 14px; border-radius:20px; background:rgba(0,0,0,.7); color:white; font-size:11px; white-space:nowrap; } /* CLOSE */ #closeAR{ position:absolute; top:calc(12px + env(safe-area-inset-top,0)); right:14px; width:43px; height:43px; border:0; border-radius:50%; background:rgba(0,0,0,.8); color:white; font-size:25px; pointer-events:auto; } /* AR BOTTOM */ #arBottom{ position:absolute; left:0; right:0; bottom:calc(18px + env(safe-area-inset-bottom,0)); display:flex; align-items:center; justify-content:space-between; padding:0 18px; } /* CUBE */ #cubeButton{ width:64px; height:64px; border:0; border-radius:17px; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; pointer-events:auto; touch-action:none; box-shadow:0 5px 20px rgba(0,0,0,.45); } #cube{ width:34px; height:34px; position:relative; transform-style:preserve-3d; transform:rotateX(-25deg) rotateY(35deg); } .face{ position:absolute; width:34px; height:34px; border:2px solid #111; background:#d9a441; } .front{transform:translateZ(17px)} .back{transform:rotateY(180deg) translateZ(17px)} .right{transform:rotateY(90deg) translateZ(17px);background:#b78327} .left{transform:rotateY(-90deg) translateZ(17px);background:#e7c36f} .top{transform:rotateX(90deg) translateZ(17px);background:#f1d58f} .bottom{transform:rotateX(-90deg) translateZ(17px);background:#8d651f} /* CAMERA */ #photoButton{ width:64px; height:64px; border:5px solid white; border-radius:50%; background:#111; color:white; font-size:27px; display:flex; align-items:center; justify-content:center; pointer-events:auto; box-shadow:0 5px 20px rgba(0,0,0,.45); } /* STATUS */ #status{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:200; display:none; max-width:85%; padding:14px 18px; border-radius:15px; background:rgba(0,0,0,.9); color:white; font-size:13px; text-align:center; } #status.show{display:block} /* FLASH */ #flash{ position:fixed; inset:0; background:white; opacity:0; pointer-events:none; z-index:500; } #flash.active{ animation:flash .25s ease; } @keyframes flash{ 0%{opacity:0} 30%{opacity:.9} 100%{opacity:0} } @media(max-width:380px){ #cubeButton,#photoButton{ width:56px; height:56px; } } </style> </head> <body> <div id="app">
-<header>
-    <h1>Mayan Sculpture</h1>
-    <p>Explore the sculpture in augmented reality</p>
-</header>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
 
-<model-viewer
-    id="model"
-    src="./escultura.glb"
-    alt="Mayan sculpture"
+  <meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no"
+  >
 
-    ar
-    ar-modes="webxr scene-viewer quick-look"
+  <title>Escultura AR</title>
 
-    camera-controls
-    touch-action="none"
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    shadow-intensity="1"
-    shadow-softness=".7"
-    exposure="1"
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
 
-    environment-image="neutral"
+    #controls {
+      position: fixed;
+      bottom: 25px;
+      left: 20px;
+      right: 20px;
 
-    camera-orbit="0deg 75deg 3m"
-    min-camera-orbit="auto 10deg .5m"
-    max-camera-orbit="auto 170deg 10m"
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    field-of-view="30deg">
+      z-index: 100;
+      pointer-events: none;
+    }
 
-    <button
-        slot="ar-button"
-        id="arButton">
-        📱 VIEW IN MY SPACE
+    #cube {
+      width: 110px;
+      height: 110px;
+
+      background: rgba(0,0,0,.55);
+      border-radius: 15px;
+
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    #photo {
+      width: 70px;
+      height: 70px;
+
+      border: 2px solid white;
+      border-radius: 14px;
+
+      background: rgba(0,0,0,.6);
+      color: white;
+
+      font-size: 30px;
+
+      pointer-events: auto;
+    }
+
+    #info {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      color: white;
+      background: rgba(0,0,0,.6);
+
+      padding: 10px 15px;
+      border-radius: 20px;
+
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="info">
+    Pulsa Enter AR y apunta al suelo
+  </div>
+
+  <div id="controls">
+
+    <canvas
+      id="cube"
+      width="110"
+      height="110">
+    </canvas>
+
+    <button id="photo">
+      📷
     </button>
 
-</model-viewer>
+  </div>
 
 
-<!-- NORMAL CONTROLS -->
+  <script type="module">
 
-<div id="controls">
+    import * as THREE from
+      'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 
-    <button class="control" id="reset">🎯</button>
+    import { GLTFLoader } from
+      'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
 
-    <button class="control" id="left">↶</button>
-
-    <button class="control" id="right">↷</button>
-
-    <button class="control" id="zoomOut">−</button>
-
-    <button class="control" id="zoomIn">+</button>
-
-</div>
+    import { ARButton } from
+      'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/webxr/ARButton.js';
 
 
-<!-- AR CONTROLS -->
+    // ========================================
+    // THREE
+    // ========================================
 
-<div id="arUI">
-
-    <div id="arTitle">
-        MAYAN SCULPTURE · AR
-    </div>
-
-    <button id="closeAR">×</button>
-
-    <div id="arBottom">
-
-        <!-- ROTATION CUBE -->
-
-        <button id="cubeButton">
-
-            <div id="cube">
-
-                <div class="face front"></div>
-                <div class="face back"></div>
-                <div class="face right"></div>
-                <div class="face left"></div>
-                <div class="face top"></div>
-                <div class="face bottom"></div>
-
-            </div>
-
-        </button>
+    const scene =
+      new THREE.Scene();
 
 
-        <!-- CAMERA -->
+    const camera =
+      new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth /
+        window.innerHeight,
+        0.01,
+        100
+      );
 
-        <button id="photoButton">
-            📷
-        </button>
 
-    </div>
+    const renderer =
+      new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true
+      });
 
-</div>
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+      window.devicePixelRatio
+    );
+
+    renderer.xr.enabled = true;
+
+    document.body.appendChild(
+      renderer.domElement
+    );
 
 
-<div id="status"></div>
+    // ========================================
+    // AR
+    // ========================================
 
-<div id="flash"></div>
+    const arButton =
+      ARButton.createButton(
+        renderer,
+        {
+          requiredFeatures: [
+            'hit-test'
+          ],
 
-</div> <script> const model = document.getElementById("model"); const controls = document.getElementById("controls"); const arUI = document.getElementById("arUI"); const reset = document.getElementById("reset"); const left = document.getElementById("left"); const right = document.getElementById("right"); const zoomIn = document.getElementById("zoomIn"); const zoomOut = document.getElementById("zoomOut"); const cubeButton = document.getElementById("cubeButton"); const cube = document.getElementById("cube"); const photoButton = document.getElementById("photoButton"); const closeAR = document.getElementById("closeAR"); const status = document.getElementById("status"); const flash = document.getElementById("flash"); /* STATUS */ let statusTimer; function showStatus(message,time=2500){ status.textContent=message; status.classList.add("show"); clearTimeout(statusTimer); statusTimer=setTimeout(()=>{ status.classList.remove("show"); },time); } /* RESET */ reset.addEventListener("click",()=>{ model.cameraOrbit="0deg 75deg 3m"; model.fieldOfView="30deg"; }); /* ROTATE */ function rotateModel(degrees){ const orbit= model.getCameraOrbit(); const theta= orbit.theta+ degrees*Math.PI/180; model.cameraOrbit= `${theta}rad ${orbit.phi}rad ${orbit.radius}m`; } left.addEventListener("click",()=>{ rotateModel(-30); }); right.addEventListener("click",()=>{ rotateModel(30); }); /* ZOOM */ function zoom(factor){ const orbit= model.getCameraOrbit(); let radius= orbit.radius*factor; radius= Math.max(.5,Math.min(10,radius)); model.cameraOrbit= `${orbit.theta}rad ${orbit.phi}rad ${radius}m`; } zoomIn.addEventListener("click",()=>{ zoom(.8); }); zoomOut.addEventListener("click",()=>{ zoom(1.25); }); /* AR STATUS */ model.addEventListener("ar-status",event=>{ const state= event.detail.status; console.log("AR:",state); if(state==="session-started"){ controls.style.display="none"; arUI.classList.add("active"); showStatus( "Move your phone to find a surface.", 3000 ); } if(state==="not-presenting"){ controls.style.display="flex"; arUI.classList.remove("active"); } }); /* CLOSE AR */ closeAR.addEventListener("click",()=>{ /* model-viewer will close the AR session when the user leaves the AR presentation. */ arUI.classList.remove("active"); controls.style.display="flex"; }); /* CUBE */ let dragging=false; let lastX=0; let lastY=0; let cubeX=-25; let cubeY=35; cubeButton.addEventListener("pointerdown",event=>{ dragging=true; lastX=event.clientX; lastY=event.clientY; cubeButton.setPointerCapture( event.pointerId ); }); cubeButton.addEventListener("pointermove",event=>{ if(!dragging)return; const dx= event.clientX-lastX; const dy= event.clientY-lastY; lastX=event.clientX; lastY=event.clientY; cubeY+=dx*.8; cubeX-=dy*.8; cubeX= Math.max(-80,Math.min(80,cubeX)); cube.style.transform= `rotateX(${cubeX}deg) rotateY(${cubeY}deg)`; }); function stopCube(){ dragging=false; } cubeButton.addEventListener( "pointerup", stopCube ); cubeButton.addEventListener( "pointercancel", stopCube ); /* PHOTO */ photoButton.addEventListener("click",async()=>{ flash.classList.remove("active"); void flash.offsetWidth; flash.classList.add("active"); try{ if(typeof model.toBlob!=="function"){ throw new Error("Photo unavailable"); } const blob= await model.toBlob({ idealAspect:1, mimeType:"image/png" }); if(!blob){ throw new Error("Image unavailable"); } const url= URL.createObjectURL(blob); const link= document.createElement("a"); link.href=url; link.download= `mayan-sculpture-${Date.now()}.png`; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>{ URL.revokeObjectURL(url); },2000); showStatus("Photo saved.",2000); }catch(error){ console.error(error); showStatus( "Photo capture is not available on this browser.", 3500 ); } }); /* MODEL LOADED */ model.addEventListener("load",()=>{ model.cameraOrbit= "0deg 75deg 3m"; }); </script> </body> </html>
+          optionalFeatures: [
+            'dom-overlay'
+          ],
+
+          domOverlay: {
+            root: document.body
+          }
+        }
+      );
+
+    document.body.appendChild(
+      arButton
+    );
+
+
+    // ========================================
+    // LUZ
+    // ========================================
+
+    const light =
+      new THREE.HemisphereLight(
+        0xffffff,
+        0x444444,
+        3
+      );
+
+    scene.add(light);
+
+
+    // ========================================
+    // ESCULTURA
+    // ========================================
+
+    let sculpture = null;
+
+    const loader =
+      new GLTFLoader();
+
+
+    loader.load(
+      './escultura.glb',
+
+      (gltf) => {
+
+        sculpture =
+          gltf.scene;
+
+        sculpture.scale.set(
+          0.5,
+          0.5,
+          0.5
+        );
+
+        sculpture.visible =
+          false;
+
+        scene.add(
+          sculpture
+        );
+
+      },
+
+      undefined,
+
+      (error) => {
+
+        console.error(
+          'Error cargando escultura:',
+          error
+        );
+
+      }
+    );
+
+
+    // ========================================
+    // RETÍCULA
+    // ========================================
+
+    const reticle =
+      new THREE.Mesh(
+
+        new THREE.RingGeometry(
+          0.08,
+          0.1,
+          32
+        ).rotateX(
+          -Math.PI / 2
+        ),
+
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff
+        })
+
+      );
+
+    reticle.matrixAutoUpdate =
+      false;
+
+    reticle.visible =
+      false;
+
+    scene.add(
+      reticle
+    );
+
+
+    // ========================================
+    // CONTROLLER
+    // ========================================
+
+    const controller =
+      renderer.xr.getController(0);
+
+    scene.add(
+      controller
+    );
+
+
+    let hitTestSource =
+      null;
+
+    let hitTestRequested =
+      false;
+
+
+    controller.addEventListener(
+      'select',
+      () => {
+
+        if (
+          !reticle.visible ||
+          !sculpture
+        ) {
+          return;
+        }
+
+        sculpture.position.setFromMatrixPosition(
+          reticle.matrix
+        );
+
+        sculpture.visible =
+          true;
+
+        document.getElementById(
+          'info'
+        ).textContent =
+          'Arrastra el cubo para girar';
+
+      }
+    );
+
+
+    // ========================================
+    // CUBO DE ROTACIÓN
+    // ========================================
+
+    const cube =
+      document.getElementById(
+        'cube'
+      );
+
+    const ctx =
+      cube.getContext(
+        '2d'
+      );
+
+
+    let cubeX = -0.4;
+    let cubeY = 0.5;
+
+    let dragging = false;
+
+    let lastX = 0;
+    let lastY = 0;
+
+
+    function drawCube() {
+
+      ctx.clearRect(
+        0,
+        0,
+        110,
+        110
+      );
+
+      const cx = 55;
+      const cy = 55;
+      const size = 32;
+
+
+      const vertices = [
+
+        [-1,-1,-1],
+        [ 1,-1,-1],
+        [ 1, 1,-1],
+        [-1, 1,-1],
+
+        [-1,-1, 1],
+        [ 1,-1, 1],
+        [ 1, 1, 1],
+        [-1, 1, 1]
+
+      ];
+
+
+      function project(v) {
+
+        let [x,y,z] = v;
+
+
+        // X
+
+        const cosX =
+          Math.cos(cubeX);
+
+        const sinX =
+          Math.sin(cubeX);
+
+        const yy =
+          y * cosX -
+          z * sinX;
+
+        const zz =
+          y * sinX +
+          z * cosX;
+
+        y = yy;
+        z = zz;
+
+
+        // Y
+
+        const cosY =
+          Math.cos(cubeY);
+
+        const sinY =
+          Math.sin(cubeY);
+
+        const xx =
+          x * cosY +
+          z * sinY;
+
+        x = xx;
+
+
+        return [
+          cx + x * size,
+          cy + y * size
+        ];
+
+      }
+
+
+      const p =
+        vertices.map(project);
+
+
+      const faces = [
+
+        [0,1,2,3,'#e53935'],
+        [4,5,6,7,'#1e88e5'],
+        [0,4,7,3,'#43a047'],
+        [1,5,6,2,'#ff9800'],
+        [3,2,6,7,'#9c27b0'],
+        [0,1,5,4,'#00acc1']
+
+      ];
+
+
+      for (
+        const face of faces
+      ) {
+
+        ctx.beginPath();
+
+        face.slice(0,4)
+          .forEach(
+            (index,i) => {
+
+              const [
+                x,
+                y
+              ] = p[index];
+
+              if (i === 0)
+                ctx.moveTo(x,y);
+              else
+                ctx.lineTo(x,y);
+
+            }
+          );
+
+        ctx.closePath();
+
+        ctx.fillStyle =
+          face[4];
+
+        ctx.globalAlpha =
+          .85;
+
+        ctx.fill();
+
+        ctx.globalAlpha =
+          1;
+
+        ctx.strokeStyle =
+          'white';
+
+        ctx.lineWidth =
+          2;
+
+        ctx.stroke();
+
+      }
+
+    }
+
+
+    drawCube();
+
+
+    // ========================================
+    // ARRASTRAR CUBO
+    // ========================================
+
+    cube.addEventListener(
+      'pointerdown',
+      (event) => {
+
+        dragging = true;
+
+        lastX =
+          event.clientX;
+
+        lastY =
+          event.clientY;
+
+        cube.setPointerCapture(
+          event.pointerId
+        );
+
+      }
+    );
+
+
+    cube.addEventListener(
+      'pointermove',
+      (event) => {
+
+        if (!dragging)
+          return;
+
+
+        const dx =
+          event.clientX -
+          lastX;
+
+        const dy =
+          event.clientY -
+          lastY;
+
+
+        lastX =
+          event.clientX;
+
+        lastY =
+          event.clientY;
+
+
+        cubeY +=
+          dx * 0.01;
+
+        cubeX +=
+          dy * 0.01;
+
+
+        drawCube();
+
+
+        if (sculpture) {
+
+          sculpture.rotation.y +=
+            dx * 0.01;
+
+          sculpture.rotation.x +=
+            dy * 0.01;
+
+        }
+
+      }
+    );
+
+
+    cube.addEventListener(
+      'pointerup',
+      () => {
+
+        dragging = false;
+
+      }
+    );
+
+
+    // ========================================
+    // Z
+    // ========================================
+
+    cube.addEventListener(
+      'dblclick',
+      () => {
+
+        if (sculpture) {
+
+          sculpture.rotation.z +=
+            Math.PI / 8;
+
+        }
+
+      }
+    );
+
+
+    // ========================================
+    // HIT TEST
+    // ========================================
+
+    renderer.setAnimationLoop(
+      (
+        timestamp,
+        frame
+      ) => {
+
+        if (frame) {
+
+          const session =
+            renderer.xr.getSession();
+
+          const referenceSpace =
+            renderer.xr.getReferenceSpace();
+
+
+          if (!hitTestRequested) {
+
+            session
+              .requestReferenceSpace(
+                'viewer'
+              )
+              .then(
+                (viewerSpace) => {
+
+                  session
+                    .requestHitTestSource({
+                      space:
+                        viewerSpace
+                    })
+                    .then(
+                      (source) => {
+
+                        hitTestSource =
+                          source;
+
+                      }
+                    );
+
+                }
+              );
+
+
+            hitTestRequested =
+              true;
+
+          }
+
+
+          if (hitTestSource) {
+
+            const results =
+              frame.getHitTestResults(
+                hitTestSource
+              );
+
+
+            if (
+              results.length > 0
+            ) {
+
+              const hit =
+                results[0];
+
+              const pose =
+                hit.getPose(
+                  referenceSpace
+                );
+
+
+              reticle.visible =
+                true;
+
+              reticle.matrix.fromArray(
+                pose.transform.matrix
+              );
+
+            }
+
+          }
+
+        }
+
+
+        renderer.render(
+          scene,
+          camera
+        );
+
+      }
+    );
+
+
+    // ========================================
+    // FOTO
+    // ========================================
+
+    document
+      .getElementById('photo')
+      .addEventListener(
+        'click',
+        () => {
+
+          const image =
+            renderer.domElement
+              .toDataURL(
+                'image/png'
+              );
+
+          const link =
+            document.createElement(
+              'a'
+            );
+
+          link.download =
+            'escultura.png';
+
+          link.href =
+            image;
+
+          link.click();
+
+        }
+      );
+
+
+    // ========================================
+    // RESIZE
+    // ========================================
+
+    window.addEventListener(
+      'resize',
+      () => {
+
+        camera.aspect =
+          window.innerWidth /
+          window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
