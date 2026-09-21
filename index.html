@@ -1,185 +1,517 @@
-<!DOCTYPE html> <html lang="es"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escultura Maya AR</title>
+<!DOCTYPE html>
+<html lang="es">
 
-<script type="module"
-    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
-</script>
+<head>
 
-<style>
-    * {
-        box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
 
-    body {
-        margin: 0;
-        background: #111;
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
 
-    header {
-        padding: 18px 15px 10px;
-    }
+    <title>Escultura Maya AR</title>
 
-    h1 {
-        margin: 0;
-        font-size: 25px;
-    }
+    <script type="module"
+        src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+    </script>
 
-    header p {
-        margin: 6px 0 0;
-        color: #aaa;
-        font-size: 14px;
-    }
 
-    .visor {
-        position: relative;
-        width: 100%;
-        height: 65vh;
-        min-height: 400px;
-    }
+    <style>
 
-    model-viewer {
-        width: 100%;
-        height: 100%;
-        background: #222;
-        --poster-color: #222;
-    }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* PANEL DE CONTROLES */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            touch-action: manipulation;
+        }
 
-    .controles {
-        position: absolute;
-        left: 50%;
-        bottom: 15px;
-        transform: translateX(-50%);
+        body {
+            overflow-x: hidden;
+        }
 
-        display: flex;
-        align-items: center;
-        gap: 10px;
 
-        padding: 10px 12px;
+        /* =========================
+           CABECERA
+        ========================= */
 
-        background: rgba(0, 0, 0, 0.72);
-        backdrop-filter: blur(8px);
+        header {
+            padding: 16px 15px 10px;
+        }
 
-        border-radius: 16px;
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
 
-        z-index: 10;
-    }
+        header p {
+            margin: 6px 0 0;
+            color: #aaa;
+            font-size: 14px;
+        }
 
-    .control {
-        width: 48px;
-        height: 48px;
 
-        border: none;
-        border-radius: 12px;
-
-        background: #fff;
-        color: #111;
-
-        font-size: 21px;
-        font-weight: bold;
-
-        cursor: pointer;
-
-        touch-action: manipulation;
-    }
-
-    .control:active {
-        transform: scale(0.94);
-    }
-
-    .control-largo {
-        width: auto;
-        padding: 0 15px;
-        font-size: 14px;
-    }
-
-    /* PANEL INFERIOR */
-
-    .panel {
-        padding: 15px;
-        max-width: 600px;
-        margin: auto;
-    }
-
-    .fila {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .boton {
-        border: none;
-        border-radius: 12px;
-
-        padding: 13px 18px;
-
-        background: #fff;
-        color: #111;
-
-        font-size: 15px;
-        font-weight: bold;
-
-        cursor: pointer;
-        touch-action: manipulation;
-    }
-
-    .boton.secundario {
-        background: #333;
-        color: white;
-    }
-
-    .boton.ar {
-        background: #d9a441;
-        color: #111;
-    }
-
-    /* INFORMACIÓN */
-
-    .info {
-        margin-top: 10px;
-        color: #999;
-        font-size: 13px;
-    }
-
-    /* MÓVIL */
-
-    @media (max-width: 500px) {
+        /* =========================
+           VISOR
+        ========================= */
 
         .visor {
-            height: 62vh;
-            min-height: 350px;
+            position: relative;
+            width: 100%;
+            height: 68vh;
+            min-height: 430px;
         }
+
+        model-viewer {
+
+            width: 100%;
+            height: 100%;
+
+            background: #222;
+
+            --poster-color: #222;
+
+            touch-action: none;
+        }
+
+
+        /* =========================
+           CONTROLES DE CÁMARA
+        ========================= */
 
         .controles {
+
+            position: absolute;
+
+            left: 50%;
+            bottom: 18px;
+
+            transform: translateX(-50%);
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 52px);
+
+            grid-template-rows:
+                repeat(3, 52px);
+
             gap: 7px;
-            padding: 8px;
+
+            padding: 10px;
+
+            background: rgba(0, 0, 0, 0.72);
+
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            z-index: 10;
         }
+
+
+        /* =========================
+           BOTONES
+        ========================= */
 
         .control {
-            width: 43px;
-            height: 43px;
+
+            width: 52px;
+            height: 52px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: #fff;
+            color: #111;
+
+            font-size: 22px;
+            font-weight: bold;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+
+            touch-action: manipulation;
+
+            user-select: none;
+            -webkit-user-select: none;
+
+            transition:
+                transform 0.08s,
+                background 0.15s;
         }
 
-        .control-largo {
-            padding: 0 10px;
-        }
-    }
-</style>
+        .control:active {
 
-</head> <body>
+            transform: scale(0.88);
+
+            background: #d9a441;
+        }
+
+
+        .control.centro {
+
+            background: #d9a441;
+
+            font-size: 20px;
+        }
+
+
+        /* =========================
+           CONTROLES EXTRA
+        ========================= */
+
+        .controles-extra {
+
+            position: absolute;
+
+            right: 12px;
+            bottom: 18px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+            z-index: 10;
+        }
+
+        .control-extra {
+
+            width: 50px;
+            height: 50px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: rgba(0, 0, 0, 0.75);
+
+            color: white;
+
+            font-size: 21px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            touch-action: manipulation;
+
+            user-select: none;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.08s,
+                background 0.15s;
+        }
+
+        .control-extra:active {
+
+            transform: scale(0.9);
+
+            background: #d9a441;
+
+            color: #111;
+        }
+
+
+        /* =========================
+           BOTÓN FOTO
+        ========================= */
+
+        #foto {
+
+            background: white;
+
+            color: #111;
+
+            font-size: 22px;
+        }
+
+
+        /* =========================
+           BOTÓN VÍDEO
+        ========================= */
+
+        #video {
+
+            background: #d9a441;
+
+            color: #111;
+
+            font-size: 21px;
+        }
+
+
+        /* =========================
+           VÍDEO ACTIVO
+        ========================= */
+
+        #video.grabando {
+
+            background: #e53935;
+
+            color: white;
+
+            animation: pulsarVideo 1s infinite;
+        }
+
+
+        @keyframes pulsarVideo {
+
+            0% {
+                box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(229, 57, 53, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(229, 57, 53, 0);
+            }
+        }
+
+
+        /* =========================
+           INDICADOR DE GRABACIÓN
+        ========================= */
+
+        .indicador-grabacion {
+
+            position: absolute;
+
+            top: 15px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background: rgba(229, 57, 53, 0.92);
+
+            color: white;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            z-index: 20;
+
+            display: none;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.3);
+        }
+
+
+        .indicador-grabacion.activo {
+
+            display: block;
+        }
+
+
+        /* =========================
+           PANEL INFERIOR
+        ========================= */
+
+        .panel {
+
+            padding: 15px;
+
+            max-width: 600px;
+
+            margin: auto;
+        }
+
+        .fila {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .boton {
+
+            border: none;
+
+            border-radius: 13px;
+
+            padding: 14px 18px;
+
+            background: #fff;
+
+            color: #111;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            touch-action: manipulation;
+
+            user-select: none;
+        }
+
+        .boton:active {
+
+            transform: scale(0.95);
+        }
+
+
+        .boton.secundario {
+
+            background: #333;
+
+            color: white;
+        }
+
+
+        .boton.ar {
+
+            background: #d9a441;
+
+            color: #111;
+
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+
+        /* =========================
+           INFORMACIÓN
+        ========================= */
+
+        .info {
+
+            margin-top: 12px;
+
+            color: #999;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =========================
+           MÓVIL PEQUEÑO
+        ========================= */
+
+        @media (max-width: 500px) {
+
+            .visor {
+
+                height: 64vh;
+
+                min-height: 390px;
+            }
+
+            .controles {
+
+                grid-template-columns:
+                    repeat(3, 47px);
+
+                grid-template-rows:
+                    repeat(3, 47px);
+
+                gap: 6px;
+
+                padding: 8px;
+            }
+
+            .control {
+
+                width: 47px;
+                height: 47px;
+
+                border-radius: 13px;
+
+                font-size: 20px;
+            }
+
+            .controles-extra {
+
+                right: 8px;
+                bottom: 14px;
+            }
+
+            .control-extra {
+
+                width: 45px;
+                height: 45px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
 <header>
+
     <h1>Escultura Maya</h1>
-    <p>Explora la escultura en 3D</p>
+
+    <p>
+        Explora la escultura en 3D
+    </p>
+
 </header>
+
 
 <div class="visor">
 
+
+    <!-- =========================
+         INDICADOR DE GRABACIÓN
+    ========================= -->
+
+    <div
+        id="indicadorGrabacion"
+        class="indicador-grabacion">
+
+        🔴 GRABANDO
+
+    </div>
+
+
+    <!-- =========================
+         MODELO 3D
+    ========================= -->
+
     <model-viewer
+
         id="modelo"
 
         src="./escultura.glb"
@@ -187,17 +519,30 @@
         alt="Escultura Maya"
 
         ar
+
         ar-modes="webxr scene-viewer quick-look"
 
         camera-controls
 
         shadow-intensity="1"
+
         exposure="1"
 
-        min-camera-orbit="auto auto 1m"
-        max-camera-orbit="auto auto 10m">
+        environment-image="neutral"
 
-        <!-- Botón AR -->
+        min-camera-orbit="auto auto 1m"
+
+        max-camera-orbit="auto auto 10m"
+
+        camera-orbit="0deg 75deg 3m"
+
+        interaction-prompt="auto"
+
+        touch-action="none">
+
+
+        <!-- BOTÓN AR -->
+
         <button
             slot="ar-button"
             class="boton ar">
@@ -206,219 +551,900 @@
 
         </button>
 
+
     </model-viewer>
 
 
-    <!-- CONTROLES DIRECTOS -->
+    <!-- =========================
+         CONTROL DIRECCIONAL
+    ========================= -->
 
     <div class="controles">
+
+
+        <button
+            class="control"
+            id="arriba"
+            aria-label="Inclinar hacia arriba">
+
+            ▲
+
+        </button>
+
 
         <button
             class="control"
             id="izquierda"
-            title="Rotar izquierda">
+            aria-label="Rotar izquierda">
 
-            ↶
+            ◀
 
         </button>
+
+
+        <button
+            class="control centro"
+            id="reset"
+            aria-label="Centrar modelo">
+
+            🎯
+
+        </button>
+
 
         <button
             class="control"
             id="derecha"
-            title="Rotar derecha">
+            aria-label="Rotar derecha">
 
-            ↷
+            ▶
 
         </button>
+
+
+        <button
+            class="control"
+            id="abajo"
+            aria-label="Inclinar hacia abajo">
+
+            ▼
+
+        </button>
+
 
         <button
             class="control"
             id="zoomMenos"
-            title="Alejar">
+            aria-label="Alejar">
 
             −
 
         </button>
 
+
+        <button
+            class="control"
+            id="zoomCentro"
+            aria-label="Zoom">
+
+            🔍
+
+        </button>
+
+
         <button
             class="control"
             id="zoomMas"
-            title="Acercar">
+            aria-label="Acercar">
 
             +
 
         </button>
 
+
+        <div></div>
+
     </div>
+
+
+    <!-- =========================
+         CONTROLES EXTRA
+    ========================= -->
+
+    <div class="controles-extra">
+
+
+        <!-- AUTO ROTACIÓN -->
+
+        <button
+            class="control-extra"
+            id="auto"
+            aria-label="Rotación automática">
+
+            ▶
+
+        </button>
+
+
+        <!-- FOTO -->
+
+        <button
+            class="control-extra"
+            id="foto"
+            aria-label="Hacer fotografía">
+
+            📸
+
+        </button>
+
+
+        <!-- VÍDEO -->
+
+        <button
+            class="control-extra"
+            id="video"
+            aria-label="Grabar vídeo">
+
+            🎥
+
+        </button>
+
+
+    </div>
+
 
 </div>
 
 
-<!-- BOTONES PRINCIPALES -->
+<!-- =========================
+     PANEL INFERIOR
+========================= -->
 
 <div class="panel">
 
+
     <div class="fila">
+
 
         <button
             class="boton secundario"
-            id="reset">
+            id="reset2">
 
-            ⟳ Centrar
+            🎯 Centrar
 
         </button>
 
+
         <button
             class="boton secundario"
-            id="auto">
+            id="auto2">
 
             ▶ Auto
 
         </button>
 
+
     </div>
 
+
     <div class="info">
-        Usa los dedos para rotar y hacer zoom.
+
+        👆 Un dedo: girar ·
+        🤏 Dos dedos: zoom
+
+        <br>
+
+        📸 Foto: captura la vista actual ·
+        🎥 Vídeo: inicia/detiene la grabación
+
     </div>
+
 
 </div>
 
 
+
 <script>
 
-    const modelo = document.getElementById("modelo");
 
-    const izquierda = document.getElementById("izquierda");
-    const derecha = document.getElementById("derecha");
+/* =========================================
+   MODELO
+========================================= */
 
-    const zoomMenos = document.getElementById("zoomMenos");
-    const zoomMas = document.getElementById("zoomMas");
-
-    const reset = document.getElementById("reset");
-    const auto = document.getElementById("auto");
+const modelo =
+    document.getElementById("modelo");
 
 
-    /* =========================
-       ROTACIÓN
-    ========================= */
+/* =========================================
+   BOTONES
+========================================= */
 
-    function rotar(grados) {
+const izquierda =
+    document.getElementById("izquierda");
 
-        const orbita = modelo.getCameraOrbit();
+const derecha =
+    document.getElementById("derecha");
 
-        const nuevoTheta =
-            orbita.theta + (grados * Math.PI / 180);
+const arriba =
+    document.getElementById("arriba");
 
-        modelo.cameraOrbit =
-            `${nuevoTheta}rad ${orbita.phi}rad ${orbita.radius}m`;
+const abajo =
+    document.getElementById("abajo");
+
+const zoomMenos =
+    document.getElementById("zoomMenos");
+
+const zoomMas =
+    document.getElementById("zoomMas");
+
+const zoomCentro =
+    document.getElementById("zoomCentro");
+
+const reset =
+    document.getElementById("reset");
+
+const reset2 =
+    document.getElementById("reset2");
+
+const auto =
+    document.getElementById("auto");
+
+const auto2 =
+    document.getElementById("auto2");
+
+const foto =
+    document.getElementById("foto");
+
+const video =
+    document.getElementById("video");
+
+const indicadorGrabacion =
+    document.getElementById("indicadorGrabacion");
+
+
+/* =========================================
+   VALORES INICIALES
+========================================= */
+
+const ORBITA_INICIAL = {
+
+    theta: 0,
+
+    phi: 75,
+
+    radius: 3
+
+};
+
+
+/* =========================================
+   ROTACIÓN HORIZONTAL
+========================================= */
+
+function rotarHorizontal(grados) {
+
+    const orbita =
+        modelo.getCameraOrbit();
+
+    const nuevoTheta =
+        orbita.theta +
+        (grados * Math.PI / 180);
+
+    modelo.cameraOrbit =
+
+        `${nuevoTheta}rad ` +
+        `${orbita.phi}rad ` +
+        `${orbita.radius}m`;
+}
+
+
+/* =========================================
+   ROTACIÓN VERTICAL
+========================================= */
+
+function rotarVertical(grados) {
+
+    const orbita =
+        modelo.getCameraOrbit();
+
+    let nuevoPhi =
+        orbita.phi +
+        (grados * Math.PI / 180);
+
+    const minimo =
+        10 * Math.PI / 180;
+
+    const maximo =
+        170 * Math.PI / 180;
+
+    nuevoPhi =
+        Math.max(
+            minimo,
+            Math.min(maximo, nuevoPhi)
+        );
+
+    modelo.cameraOrbit =
+
+        `${orbita.theta}rad ` +
+        `${nuevoPhi}rad ` +
+        `${orbita.radius}m`;
+}
+
+
+/* =========================================
+   ROTAR IZQUIERDA
+========================================= */
+
+izquierda.addEventListener(
+    "click",
+    () => {
+
+        rotarHorizontal(-30);
+
     }
+);
 
 
-    izquierda.addEventListener("click", () => {
+/* =========================================
+   ROTAR DERECHA
+========================================= */
 
-        rotar(-30);
+derecha.addEventListener(
+    "click",
+    () => {
 
-    });
+        rotarHorizontal(30);
 
-
-    derecha.addEventListener("click", () => {
-
-        rotar(30);
-
-    });
-
-
-    /* =========================
-       ZOOM
-    ========================= */
-
-    function zoom(factor) {
-
-        const orbita = modelo.getCameraOrbit();
-
-        let nuevoRadio =
-            orbita.radius * factor;
-
-        nuevoRadio =
-            Math.max(1, Math.min(10, nuevoRadio));
-
-        modelo.cameraOrbit =
-            `${orbita.theta}rad ${orbita.phi}rad ${nuevoRadio}m`;
     }
+);
 
 
-    zoomMas.addEventListener("click", () => {
+/* =========================================
+   MIRAR ARRIBA
+========================================= */
+
+arriba.addEventListener(
+    "click",
+    () => {
+
+        rotarVertical(-15);
+
+    }
+);
+
+
+/* =========================================
+   MIRAR ABAJO
+========================================= */
+
+abajo.addEventListener(
+    "click",
+    () => {
+
+        rotarVertical(15);
+
+    }
+);
+
+
+/* =========================================
+   ZOOM
+========================================= */
+
+function zoom(factor) {
+
+    const orbita =
+        modelo.getCameraOrbit();
+
+    let nuevoRadio =
+        orbita.radius * factor;
+
+    nuevoRadio =
+        Math.max(
+            1,
+            Math.min(10, nuevoRadio)
+        );
+
+    modelo.cameraOrbit =
+
+        `${orbita.theta}rad ` +
+        `${orbita.phi}rad ` +
+        `${nuevoRadio}m`;
+}
+
+
+/* =========================================
+   ACERCAR
+========================================= */
+
+zoomMas.addEventListener(
+    "click",
+    () => {
 
         zoom(0.8);
 
-    });
+    }
+);
 
 
-    zoomMenos.addEventListener("click", () => {
+/* =========================================
+   ALEJAR
+========================================= */
+
+zoomMenos.addEventListener(
+    "click",
+    () => {
 
         zoom(1.25);
 
-    });
+    }
+);
 
 
-    /* =========================
-       CENTRAR
-    ========================= */
+/* =========================================
+   ZOOM CENTRO
+========================================= */
 
-    reset.addEventListener("click", () => {
+zoomCentro.addEventListener(
+    "click",
+    () => {
 
-        modelo.cameraOrbit = "0deg 75deg 3m";
+        zoom(0.9);
 
-        modelo.fieldOfView = "30deg";
-
-    });
-
-
-    /* =========================
-       AUTO ROTACIÓN
-    ========================= */
-
-    let autoActivo = false;
+    }
+);
 
 
-    auto.addEventListener("click", () => {
+/* =========================================
+   CENTRAR
+========================================= */
 
-        autoActivo = !autoActivo;
+function centrar() {
 
-        if (autoActivo) {
+    modelo.cameraOrbit =
+        "0deg 75deg 3m";
 
-            modelo.setAttribute(
-                "auto-rotate",
-                ""
+    modelo.fieldOfView =
+        "30deg";
+}
+
+
+reset.addEventListener(
+    "click",
+    centrar
+);
+
+reset2.addEventListener(
+    "click",
+    centrar
+);
+
+
+/* =========================================
+   AUTO ROTACIÓN
+========================================= */
+
+let autoActivo = false;
+
+
+function cambiarAuto() {
+
+    autoActivo =
+        !autoActivo;
+
+    if (autoActivo) {
+
+        modelo.setAttribute(
+            "auto-rotate",
+            ""
+        );
+
+        modelo.setAttribute(
+            "rotation-per-second",
+            "20deg"
+        );
+
+        auto.textContent = "⏸";
+
+        auto2.textContent =
+            "⏸ Parar";
+
+    } else {
+
+        modelo.removeAttribute(
+            "auto-rotate"
+        );
+
+        auto.textContent = "▶";
+
+        auto2.textContent =
+            "▶ Auto";
+    }
+}
+
+
+auto.addEventListener(
+    "click",
+    cambiarAuto
+);
+
+auto2.addEventListener(
+    "click",
+    cambiarAuto
+);
+
+
+/* =========================================
+   FOTOGRAFÍA
+========================================= */
+
+async function hacerFoto() {
+
+    try {
+
+        /*
+         * model-viewer genera una imagen
+         * de la vista actual del modelo.
+         */
+
+        const blob =
+            await modelo.toBlob({
+                idealAspect: 1,
+                mimeType: "image/png"
+            });
+
+
+        if (!blob) {
+
+            throw new Error(
+                "No se pudo crear la imagen."
+            );
+        }
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const enlace =
+            document.createElement("a");
+
+
+        enlace.href = url;
+
+        enlace.download =
+            "escultura-maya-" +
+            Date.now() +
+            ".png";
+
+
+        document.body.appendChild(enlace);
+
+        enlace.click();
+
+        enlace.remove();
+
+
+        setTimeout(
+            () => URL.revokeObjectURL(url),
+            1000
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al hacer la fotografía:",
+            error
+        );
+
+
+        alert(
+            "No se pudo realizar la fotografía. " +
+            "Comprueba que la página está abierta mediante HTTPS."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   BOTÓN FOTO
+========================================= */
+
+foto.addEventListener(
+    "click",
+    hacerFoto
+);
+
+
+/* =========================================
+   GRABACIÓN DE VÍDEO
+========================================= */
+
+let mediaRecorder = null;
+
+let chunksVideo = [];
+
+
+/*
+ * La grabación utiliza el canvas
+ * interno del model-viewer.
+ */
+
+async function iniciarVideo() {
+
+    try {
+
+        /*
+         * Buscamos el canvas utilizado
+         * por model-viewer.
+         */
+
+        const canvas =
+            modelo.shadowRoot
+                ?.querySelector("canvas");
+
+
+        if (!canvas) {
+
+            throw new Error(
+                "No se encontró el canvas."
+            );
+        }
+
+
+        /*
+         * Capturamos el canvas.
+         *
+         * 30 FPS es suficiente para
+         * una grabación móvil ligera.
+         */
+
+        const stream =
+            canvas.captureStream(30);
+
+
+        /*
+         * Elegimos el formato disponible.
+         */
+
+        let opciones = {};
+
+        if (
+            MediaRecorder.isTypeSupported(
+                "video/webm;codecs=vp9"
+            )
+        ) {
+
+            opciones.mimeType =
+                "video/webm;codecs=vp9";
+
+        } else if (
+            MediaRecorder.isTypeSupported(
+                "video/webm;codecs=vp8"
+            )
+        ) {
+
+            opciones.mimeType =
+                "video/webm;codecs=vp8";
+
+        } else if (
+            MediaRecorder.isTypeSupported(
+                "video/webm"
+            )
+        ) {
+
+            opciones.mimeType =
+                "video/webm";
+        }
+
+
+        chunksVideo = [];
+
+
+        mediaRecorder =
+            new MediaRecorder(
+                stream,
+                opciones
             );
 
-            auto.textContent =
-                "⏸ Parar";
+
+        mediaRecorder.ondataavailable =
+            function(event) {
+
+                if (event.data &&
+                    event.data.size > 0) {
+
+                    chunksVideo.push(
+                        event.data
+                    );
+                }
+
+            };
+
+
+        mediaRecorder.onstop =
+            guardarVideo;
+
+
+        mediaRecorder.start();
+
+
+        /*
+         * Estado visual
+         */
+
+        video.classList.add(
+            "grabando"
+        );
+
+        video.textContent =
+            "⏹";
+
+        video.setAttribute(
+            "aria-label",
+            "Detener grabación"
+        );
+
+
+        indicadorGrabacion.classList.add(
+            "activo"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al iniciar vídeo:",
+            error
+        );
+
+
+        alert(
+            "No se pudo iniciar la grabación. " +
+            "Tu navegador puede no permitir esta función."
+        );
+    }
+
+}
+
+
+/* =========================================
+   DETENER VÍDEO
+========================================= */
+
+function detenerVideo() {
+
+    if (
+        mediaRecorder &&
+        mediaRecorder.state !== "inactive"
+    ) {
+
+        mediaRecorder.stop();
+
+    }
+
+}
+
+
+/* =========================================
+   GUARDAR VÍDEO
+========================================= */
+
+function guardarVideo() {
+
+    const blob =
+        new Blob(
+            chunksVideo,
+            {
+                type:
+                    mediaRecorder.mimeType ||
+                    "video/webm"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const enlace =
+        document.createElement("a");
+
+
+    enlace.href = url;
+
+    enlace.download =
+        "escultura-maya-" +
+        Date.now() +
+        ".webm";
+
+
+    document.body.appendChild(
+        enlace
+    );
+
+    enlace.click();
+
+    enlace.remove();
+
+
+    setTimeout(
+        () => URL.revokeObjectURL(url),
+        2000
+    );
+
+
+    /*
+     * Restauramos el botón
+     */
+
+    video.classList.remove(
+        "grabando"
+    );
+
+    video.textContent =
+        "🎥";
+
+    video.setAttribute(
+        "aria-label",
+        "Grabar vídeo"
+    );
+
+
+    indicadorGrabacion.classList.remove(
+        "activo"
+    );
+
+}
+
+
+/* =========================================
+   BOTÓN VÍDEO
+========================================= */
+
+video.addEventListener(
+    "click",
+    () => {
+
+        if (
+            mediaRecorder &&
+            mediaRecorder.state === "recording"
+        ) {
+
+            detenerVideo();
 
         } else {
 
-            modelo.removeAttribute(
-                "auto-rotate"
-            );
-
-            auto.textContent =
-                "▶ Auto";
+            iniciarVideo();
 
         }
 
-    });
+    }
+);
 
 
-    /* =========================
-       VELOCIDAD DE AUTO ROTACIÓN
-    ========================= */
+/* =========================================
+   CONFIGURACIÓN INICIAL
+========================================= */
 
-    modelo.setAttribute(
-        "rotation-per-second",
-        "20deg"
-    );
+modelo.addEventListener(
+    "load",
+    () => {
+
+        modelo.cameraOrbit =
+            "0deg 75deg 3m";
+
+        modelo.fieldOfView =
+            "30deg";
+
+    }
+);
 
 </script>
 
-</body> </html>
+</body>
+
+</html>
