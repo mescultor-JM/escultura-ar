@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AR Sculpture</title>
   
-  <!-- Load model-viewer -->
+  <!-- Load model-viewer (no build step, no npm) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 
   <style>
-    /* --- Base Reset & Clean Design --- */
+    /* Minimal reset to ensure it fills the screen on mobile */
     body, html {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background-color: #ffffff;
+      background-color: #ffffff; /* Clean white background as requested */
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
@@ -24,11 +24,9 @@
       width: 100%;
       height: 100%;
       display: block;
-      /* Ensure AR places on horizontal surfaces */
-      --poster-color: #ffffff; 
     }
 
-    /* --- Error Handling UI --- */
+    /* Error message container (hidden by default) */
     #error-message {
       display: none;
       position: absolute;
@@ -42,159 +40,24 @@
       text-align: center;
       max-width: 80%;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-
-    /* --- Main Action Buttons (Bottom Center) --- */
-    #main-controls {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 15px;
       z-index: 100;
     }
 
-    .action-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ddd;
-      border-radius: 50px;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: transform 0.1s, background 0.2s;
-    }
-    .action-btn:active { transform: translateX(-50%) scale(0.95); }
-    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* --- 3D Navigation Cube UI (Lower Right) --- */
-    #nav-cube-wrapper {
+    /* Future UI containers (Phase 2+) - currently hidden or minimal */
+    #ui-layer {
       position: absolute;
-      bottom: 30px;
+      bottom: 20px;
       right: 20px;
-      z-index: 100;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .cube-container {
-      width: 60px;
-      height: 60px;
-      perspective: 200px;
-      cursor: grab;
-      touch-action: none; /* Prevents page scroll while dragging cube */
-    }
-    .cube-container:active { cursor: grabbing; }
-
-    .cube {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transform: rotateX(-20deg) rotateY(30deg) rotateZ(0deg);
-      transition: transform 0.1s ease-out;
-    }
-
-    .face {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1.5px solid #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      user-select: none;
-      border-radius: 4px;
-    }
-
-    .front  { transform: rotateY(0deg) translateZ(30px); }
-    .back   { transform: rotateY(180deg) translateZ(30px); }
-    .right  { transform: rotateY(90deg) translateZ(30px); }
-    .left   { transform: rotateY(-90deg) translateZ(30px); }
-    .top    { transform: rotateX(90deg) translateZ(30px); background: rgba(200, 230, 255, 0.85); }
-    .bottom { transform: rotateX(-90deg) translateZ(30px); }
-
-    /* Z-Axis and Reset Controls */
-    .cube-extra-controls {
-      display: flex;
-      gap: 8px;
-    }
-    .cube-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      width: 36px;
-      height: 36px;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .cube-btn:active { background: #e0e0e0; }
-
-    /* --- Camera Preview (Hidden by default, shown during photo mode) --- */
-    #camera-overlay {
-      display: none;
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: #000;
-      z-index: 200;
-      flex-direction: column;
-    }
-    #camera-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    #camera-controls {
-      position: absolute;
-      bottom: 40px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-    }
-    .shutter-btn {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: white;
-      border: 4px solid rgba(255,255,255,0.5);
-      cursor: pointer;
-    }
-    .close-camera-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
-      cursor: pointer;
+      gap: 12px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
 
-  <!-- Error Handling -->
+  <!-- Error handling container -->
   <div id="error-message" role="alert">
     <strong>Error:</strong> <span id="error-text">Failed to load 3D model.</span>
     <br><br>
@@ -204,244 +67,56 @@
   </div>
 
   <!-- 
-    MODEL-VIEWER CONFIGURATION
-    - ar-modes: 'webxr' is first to keep HTML UI (photo button, nav cube) visible during AR.
-    - ar-placement: 'floor' ensures it seeks horizontal surfaces.
-    - Note: scale and position are set dynamically via JS based on calibration constants below.
+    Baseline model-viewer 
+    - ar-modes prioritizes scene-viewer (native Android ARCore) then webxr.
+    - environment-image="neutral" ensures consistent lighting on the white background.
   -->
   <model-viewer 
     id="ar-model"
     src="./escultura.glb" 
     alt="A 3D model of a sculpture"
     ar 
-    ar-modes="webxr scene-viewer" 
-    ar-placement="floor"
+    ar-modes="scene-viewer webxr" 
     camera-controls 
     shadow-intensity="1"
     exposure="1"
     environment-image="neutral"
     interaction-prompt="auto">
+    
+    <!-- Navigation cube is natively handled by model-viewer's camera-controls.
+         We will style its position in later phases if needed, but it defaults 
+         to a non-obtrusive position that works well on mobile. -->
+
   </model-viewer>
 
-  <!-- Main AR / Photo Controls -->
-  <div id="main-controls">
-    <button id="btn-ar" class="action-btn">
-      <span>👁️</span> View in AR
-    </button>
-    <button id="btn-photo" class="action-btn">
-      <span>📸</span> Take Photo
-    </button>
+  <!-- UI Layer placeholder for Phase 2 (Photo/AR buttons) -->
+  <div id="ui-layer">
+    <!-- Buttons will be injected here in Phase 2 -->
   </div>
-
-  <!-- 3D Navigation Cube (Controls MODEL rotation, not camera) -->
-  <div id="nav-cube-wrapper">
-    <div class="cube-container" id="cube-container">
-      <div class="cube" id="nav-cube">
-        <div class="face front">F</div>
-        <div class="face back">B</div>
-        <div class="face right">R</div>
-        <div class="face left">L</div>
-        <div class="face top">T</div>
-        <div class="face bottom">B</div>
-      </div>
-    </div>
-    <div class="cube-extra-controls">
-      <button class="cube-btn" id="btn-rot-z-left" title="Rotate Z Left">↺</button>
-      <button class="cube-btn" id="btn-reset" title="Reset Orientation">⟲</button>
-      <button class="cube-btn" id="btn-rot-z-right" title="Rotate Z Right">↻</button>
-    </div>
-  </div>
-
-  <!-- Camera Overlay for Photography -->
-  <div id="camera-overlay">
-    <button class="close-camera-btn" id="btn-close-camera">✕</button>
-    <video id="camera-video" autoplay playsinline muted></video>
-    <div id="camera-controls">
-      <button class="shutter-btn" id="btn-shutter"></button>
-    </div>
-  </div>
-
-  <!-- Hidden canvas for capturing the photo frame -->
-  <canvas id="capture-canvas" style="display: none;"></canvas>
 
   <script>
-    // ==========================================
-    // STEP 2: AR SCALE & POSITION CALIBRATION
-    // ==========================================
-    // Adjust these two values to fix the size and floating issues.
-    // 1. MODEL_SCALE: If the model is 10x too big, set this to 0.1.
-    // 2. MODEL_Y_OFFSET: If the model floats 0.5m above the floor, set this to -0.5.
-    //    This compensates for the GLB's internal origin/pivot point.
-    const MODEL_SCALE = 0.1;       // Example: makes the model 10x smaller
-    const MODEL_Y_OFFSET = -0.5;   // Example: pushes the model down by 50cm
-
+    // Phase 1: Robust Error Handling
+    // Prevents the "infinite loading" state if the GLB is missing or corrupt.
     const modelViewer = document.querySelector('#ar-model');
     const errorMessage = document.querySelector('#error-message');
     const errorText = document.querySelector('#error-text');
 
-    // Apply calibration on load
-    modelViewer.addEventListener('load', () => {
-      console.log('[Model Viewer] Model loaded successfully.');
-      errorMessage.style.display = 'none';
-      
-      // Apply scale and position to fix size and floating
-      modelViewer.scale = `${MODEL_SCALE} ${MODEL_SCALE} ${MODEL_SCALE}`;
-      modelViewer.position = `0 ${MODEL_Y_OFFSET} 0`;
-      
-      console.log(`[Calibration] Applied scale: ${MODEL_SCALE}, Y-offset: ${MODEL_Y_OFFSET}`);
-    });
-
     modelViewer.addEventListener('error', (event) => {
       console.error('[Model Viewer Error]', event);
-      errorText.textContent = 'Failed to load the 3D model. Check ./escultura.glb and ensure HTTPS.';
+      errorText.textContent = 'Failed to load the 3D model. Please check the file path (./escultura.glb) and ensure you are using a secure (HTTPS) connection.';
       errorMessage.style.display = 'block';
     });
 
-    // ==========================================
-    // STEP 4 & 5: 3D NAVIGATION CUBE LOGIC
-    // ==========================================
-    // Controls the sculpture's rotation (X, Y, Z), NOT the camera.
-    let rotX = 0, rotY = 0, rotZ = 0;
-    const navCube = document.querySelector('#nav-cube');
-    const cubeContainer = document.querySelector('#cube-container');
-
-    function updateModelOrientation() {
-      // Update the 3D model's orientation
-      modelViewer.orientation = `${rotX}deg ${rotY}deg ${rotZ}deg`;
-      // Sync the visual CSS cube to match
-      navCube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`;
-    }
-
-    // Dragging logic for X and Y axis
-    let isDragging = false;
-    let startX = 0, startY = 0;
-
-    const startDrag = (x, y) => {
-      isDragging = true;
-      startX = x;
-      startY = y;
-    };
-
-    const moveDrag = (x, y) => {
-      if (!isDragging) return;
-      const deltaX = x - startX;
-      const deltaY = y - startY;
-
-      // Dragging horizontally (X) rotates the model around the Y axis
-      rotY += deltaX * 0.5;
-      // Dragging vertically (Y) rotates the model around the X axis
-      rotX -= deltaY * 0.5;
-
-      updateModelOrientation();
-      startX = x;
-      startY = y;
-    };
-
-    const endDrag = () => { isDragging = false; };
-
-    // Touch events (Mobile)
-    cubeContainer.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY), { passive: false });
-    cubeContainer.addEventListener('touchmove', (e) => {
-      e.preventDefault(); // Prevent scrolling while rotating cube
-      moveDrag(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: false });
-    cubeContainer.addEventListener('touchend', endDrag);
-
-    // Mouse events (Desktop testing)
-    cubeContainer.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
-    window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
-    window.addEventListener('mouseup', endDrag);
-
-    // Z-axis and Reset controls
-    document.querySelector('#btn-rot-z-left').addEventListener('click', () => {
-      rotZ -= 15;
-      updateModelOrientation();
-    });
-    document.querySelector('#btn-rot-z-right').addEventListener('click', () => {
-      rotZ += 15;
-      updateModelOrientation();
-    });
-    document.querySelector('#btn-reset').addEventListener('click', () => {
-      rotX = 0; rotY = 0; rotZ = 0;
-      updateModelOrientation();
+    modelViewer.addEventListener('load', () => {
+      console.log('[Model Viewer] Model loaded successfully.');
+      // Ensure error message is hidden if a previous error occurred and model was retried
+      errorMessage.style.display = 'none';
     });
 
-    // ==========================================
-    // PRESERVED: REAR CAMERA PHOTOGRAPHY MODE
-    // ==========================================
-    const btnPhoto = document.querySelector('#btn-photo');
-    const cameraOverlay = document.querySelector('#camera-overlay');
-    const videoElement = document.querySelector('#camera-video');
-    const btnCloseCamera = document.querySelector('#btn-close-camera');
-    const btnShutter = document.querySelector('#btn-shutter');
-    const canvas = document.querySelector('#capture-canvas');
-    let cameraStream = null;
-
-    async function startCamera() {
-      try {
-        // Request ONLY rear camera, NO microphone
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
-          audio: false
-        });
-        videoElement.srcObject = cameraStream;
-        cameraOverlay.style.display = 'flex';
-        console.log('[Camera] Rear camera started successfully.');
-      } catch (err) {
-        console.error('[Camera Error]', err);
-        alert('Camera access denied or unavailable. Please ensure you are on HTTPS and have granted camera permissions.');
-      }
-    }
-
-    function stopCamera() {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => {
-          track.stop();
-          console.log('[Camera] Track stopped, hardware released.');
-        });
-        cameraStream = null;
-      }
-      cameraOverlay.style.display = 'none';
-      videoElement.srcObject = null;
-    }
-
-    btnPhoto.addEventListener('click', startCamera);
-    btnCloseCamera.addEventListener('click', stopCamera);
-
-    btnShutter.addEventListener('click', () => {
-      if (!cameraStream) return;
-      
-      // Match canvas size to video stream
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
-      const ctx = canvas.getContext('2d');
-      
-      // Draw the current video frame
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-      
-      // Trigger download
-      const dataURL = canvas.toDataURL('image/jpeg');
-      const link = document.createElement('a');
-      link.download = `sculpture-ar-${Date.now()}.jpg`;
-      link.href = dataURL;
-      link.click();
-      
-      console.log('[Camera] Photo captured and downloaded.');
-      
-      // Optional: automatically close camera after capture
-      // stopCamera(); 
-    });
-
-    // ==========================================
-    // AR BUTTON TRIGGER
-    // ==========================================
-    document.querySelector('#btn-ar').addEventListener('click', () => {
-      // Ensure camera is stopped before entering AR to prevent conflicts
-      stopCamera();
-      // Activate model-viewer's AR mode
-      modelViewer.activateAR();
-    });
-
+    // Log environment info for debugging Android devices later
+    console.log('[App Init] User Agent:', navigator.userAgent);
+    console.log('[App Init] Secure Context:', window.isSecureContext ? 'Yes' : 'No');
   </script>
+
 </body>
 </html>
