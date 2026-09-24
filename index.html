@@ -1,122 +1,424 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AR Sculpture</title>
-  
-  <!-- Load model-viewer (no build step, no npm) -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+<!DOCTYPE html> <html lang="es"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escultura Maya AR</title>
 
-  <style>
-    /* Minimal reset to ensure it fills the screen on mobile */
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #ffffff; /* Clean white background as requested */
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+<script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+</script>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+
+    header {
+        padding: 18px 15px 10px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 25px;
+    }
+
+    header p {
+        margin: 6px 0 0;
+        color: #aaa;
+        font-size: 14px;
+    }
+
+    .visor {
+        position: relative;
+        width: 100%;
+        height: 65vh;
+        min-height: 400px;
     }
 
     model-viewer {
-      width: 100%;
-      height: 100%;
-      display: block;
+        width: 100%;
+        height: 100%;
+        background: #222;
+        --poster-color: #222;
     }
 
-    /* Error message container (hidden by default) */
-    #error-message {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #ffebee;
-      color: #c62828;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      max-width: 80%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      z-index: 100;
+    /* PANEL DE CONTROLES */
+
+    .controles {
+        position: absolute;
+        left: 50%;
+        bottom: 15px;
+        transform: translateX(-50%);
+
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 10px 12px;
+
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(8px);
+
+        border-radius: 16px;
+
+        z-index: 10;
     }
 
-    /* Future UI containers (Phase 2+) - currently hidden or minimal */
-    #ui-layer {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 10;
+    .control {
+        width: 48px;
+        height: 48px;
+
+        border: none;
+        border-radius: 12px;
+
+        background: #fff;
+        color: #111;
+
+        font-size: 21px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        touch-action: manipulation;
     }
-  </style>
-</head>
-<body>
 
-  <!-- Error handling container -->
-  <div id="error-message" role="alert">
-    <strong>Error:</strong> <span id="error-text">Failed to load 3D model.</span>
-    <br><br>
-    <button onclick="location.reload()" style="padding: 8px 16px; background: #c62828; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Reload Page
-    </button>
-  </div>
+    .control:active {
+        transform: scale(0.94);
+    }
 
-  <!-- 
-    Baseline model-viewer 
-    - ar-modes prioritizes scene-viewer (native Android ARCore) then webxr.
-    - environment-image="neutral" ensures consistent lighting on the white background.
-  -->
-  <model-viewer 
-    id="ar-model"
-    src="./escultura.glb" 
-    alt="A 3D model of a sculpture"
-    ar 
-    ar-modes="scene-viewer webxr" 
-    camera-controls 
-    shadow-intensity="1"
-    exposure="1"
-    environment-image="neutral"
-    interaction-prompt="auto">
-    
-    <!-- Navigation cube is natively handled by model-viewer's camera-controls.
-         We will style its position in later phases if needed, but it defaults 
-         to a non-obtrusive position that works well on mobile. -->
+    .control-largo {
+        width: auto;
+        padding: 0 15px;
+        font-size: 14px;
+    }
 
-  </model-viewer>
+    /* PANEL INFERIOR */
 
-  <!-- UI Layer placeholder for Phase 2 (Photo/AR buttons) -->
-  <div id="ui-layer">
-    <!-- Buttons will be injected here in Phase 2 -->
-  </div>
+    .panel {
+        padding: 15px;
+        max-width: 600px;
+        margin: auto;
+    }
 
-  <script>
-    // Phase 1: Robust Error Handling
-    // Prevents the "infinite loading" state if the GLB is missing or corrupt.
-    const modelViewer = document.querySelector('#ar-model');
-    const errorMessage = document.querySelector('#error-message');
-    const errorText = document.querySelector('#error-text');
+    .fila {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-    modelViewer.addEventListener('error', (event) => {
-      console.error('[Model Viewer Error]', event);
-      errorText.textContent = 'Failed to load the 3D model. Please check the file path (./escultura.glb) and ensure you are using a secure (HTTPS) connection.';
-      errorMessage.style.display = 'block';
+    .boton {
+        border: none;
+        border-radius: 12px;
+
+        padding: 13px 18px;
+
+        background: #fff;
+        color: #111;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .boton.secundario {
+        background: #333;
+        color: white;
+    }
+
+    .boton.ar {
+        background: #d9a441;
+        color: #111;
+    }
+
+    /* INFORMACIÓN */
+
+    .info {
+        margin-top: 10px;
+        color: #999;
+        font-size: 13px;
+    }
+
+    /* MÓVIL */
+
+    @media (max-width: 500px) {
+
+        .visor {
+            height: 62vh;
+            min-height: 350px;
+        }
+
+        .controles {
+            gap: 7px;
+            padding: 8px;
+        }
+
+        .control {
+            width: 43px;
+            height: 43px;
+        }
+
+        .control-largo {
+            padding: 0 10px;
+        }
+    }
+</style>
+
+</head> <body>
+<header>
+    <h1>Escultura Maya</h1>
+    <p>Explora la escultura en 3D</p>
+</header>
+
+<div class="visor">
+
+    <model-viewer
+        id="modelo"
+
+        src="./escultura.glb"
+
+        alt="Escultura Maya"
+
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+
+        camera-controls
+
+        shadow-intensity="1"
+        exposure="1"
+
+        min-camera-orbit="auto auto 1m"
+        max-camera-orbit="auto auto 10m">
+
+        <!-- Botón AR -->
+        <button
+            slot="ar-button"
+            class="boton ar">
+
+            📱 VER EN MI ESPACIO
+
+        </button>
+
+    </model-viewer>
+
+
+    <!-- CONTROLES DIRECTOS -->
+
+    <div class="controles">
+
+        <button
+            class="control"
+            id="izquierda"
+            title="Rotar izquierda">
+
+            ↶
+
+        </button>
+
+        <button
+            class="control"
+            id="derecha"
+            title="Rotar derecha">
+
+            ↷
+
+        </button>
+
+        <button
+            class="control"
+            id="zoomMenos"
+            title="Alejar">
+
+            −
+
+        </button>
+
+        <button
+            class="control"
+            id="zoomMas"
+            title="Acercar">
+
+            +
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- BOTONES PRINCIPALES -->
+
+<div class="panel">
+
+    <div class="fila">
+
+        <button
+            class="boton secundario"
+            id="reset">
+
+            ⟳ Centrar
+
+        </button>
+
+        <button
+            class="boton secundario"
+            id="auto">
+
+            ▶ Auto
+
+        </button>
+
+    </div>
+
+    <div class="info">
+        Usa los dedos para rotar y hacer zoom.
+    </div>
+
+</div>
+
+
+<script>
+
+    const modelo = document.getElementById("modelo");
+
+    const izquierda = document.getElementById("izquierda");
+    const derecha = document.getElementById("derecha");
+
+    const zoomMenos = document.getElementById("zoomMenos");
+    const zoomMas = document.getElementById("zoomMas");
+
+    const reset = document.getElementById("reset");
+    const auto = document.getElementById("auto");
+
+
+    /* =========================
+       ROTACIÓN
+    ========================= */
+
+    function rotar(grados) {
+
+        const orbita = modelo.getCameraOrbit();
+
+        const nuevoTheta =
+            orbita.theta + (grados * Math.PI / 180);
+
+        modelo.cameraOrbit =
+            `${nuevoTheta}rad ${orbita.phi}rad ${orbita.radius}m`;
+    }
+
+
+    izquierda.addEventListener("click", () => {
+
+        rotar(-30);
+
     });
 
-    modelViewer.addEventListener('load', () => {
-      console.log('[Model Viewer] Model loaded successfully.');
-      // Ensure error message is hidden if a previous error occurred and model was retried
-      errorMessage.style.display = 'none';
+
+    derecha.addEventListener("click", () => {
+
+        rotar(30);
+
     });
 
-    // Log environment info for debugging Android devices later
-    console.log('[App Init] User Agent:', navigator.userAgent);
-    console.log('[App Init] Secure Context:', window.isSecureContext ? 'Yes' : 'No');
-  </script>
 
-</body>
-</html>
+    /* =========================
+       ZOOM
+    ========================= */
+
+    function zoom(factor) {
+
+        const orbita = modelo.getCameraOrbit();
+
+        let nuevoRadio =
+            orbita.radius * factor;
+
+        nuevoRadio =
+            Math.max(1, Math.min(10, nuevoRadio));
+
+        modelo.cameraOrbit =
+            `${orbita.theta}rad ${orbita.phi}rad ${nuevoRadio}m`;
+    }
+
+
+    zoomMas.addEventListener("click", () => {
+
+        zoom(0.8);
+
+    });
+
+
+    zoomMenos.addEventListener("click", () => {
+
+        zoom(1.25);
+
+    });
+
+
+    /* =========================
+       CENTRAR
+    ========================= */
+
+    reset.addEventListener("click", () => {
+
+        modelo.cameraOrbit = "0deg 75deg 3m";
+
+        modelo.fieldOfView = "30deg";
+
+    });
+
+
+    /* =========================
+       AUTO ROTACIÓN
+    ========================= */
+
+    let autoActivo = false;
+
+
+    auto.addEventListener("click", () => {
+
+        autoActivo = !autoActivo;
+
+        if (autoActivo) {
+
+            modelo.setAttribute(
+                "auto-rotate",
+                ""
+            );
+
+            auto.textContent =
+                "⏸ Parar";
+
+        } else {
+
+            modelo.removeAttribute(
+                "auto-rotate"
+            );
+
+            auto.textContent =
+                "▶ Auto";
+
+        }
+
+    });
+
+
+    /* =========================
+       VELOCIDAD DE AUTO ROTACIÓN
+    ========================= */
+
+    modelo.setAttribute(
+        "rotation-per-second",
+        "20deg"
+    );
+
+</script>
+
+</body> </html>
